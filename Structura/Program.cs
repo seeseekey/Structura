@@ -31,16 +31,22 @@ namespace Structura
 
         static void Main(string[] args)
         {
-            Memory memory=new Memory();
-			Graphic graphic=new Graphic();
-
-			Structura cpu=new Structura(memory, graphic);
+			if(args.Length<1)
+			{
+				Console.WriteLine("Need assembler file.");
+				return;
+			}
 
 			if(!File.Exists(args[0]))
 			{
 				Console.WriteLine("File don't exists.");
 				return;
 			}
+
+            Memory memory=new Memory();
+			Graphic graphic=new Graphic();
+
+			Structura cpu=new Structura(memory, graphic);
 
 			File.ReadAllText(args[0]);
 			string asmCode=File.ReadAllText(args[0]);
