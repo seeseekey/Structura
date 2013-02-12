@@ -78,107 +78,107 @@ namespace Structura
         {
             switch(number)
             {
-                case 0:
+                case -1:
                     {
                         return A;
                     }
-                case 1:
+                case -2:
                     {
                         return B;
                     }
-                case 2:
+                case -3:
                     {
                         return C;
                     }
-                case 3:
+                case -4:
                     {
                         return D;
                     }
-                case 4:
+                case -5:
                     {
                         return E;
                     }
-                case 5:
+                case -6:
                     {
                         return F;
                     }
-                case 6:
+                case -7:
                     {
                         return G;
                     }
-                case 7:
+                case -8:
                     {
                         return H;
                     }
-                case 8:
+                case -9:
                     {
                         return I;
                     }
-                case 9:
+                case -10:
                     {
                         return J;
                     }
-                case 10:
+                case -11:
                     {
                         return K;
                     }
-                case 11:
+                case -12:
                     {
                         return L;
                     }
-                case 12:
+                case -13:
                     {
                         return M;
                     }
-                case 13:
+                case -14:
                     {
                         return N;
                     }
-                case 14:
+                case -15:
                     {
                         return O;
                     }
-                case 15:
+                case -16:
                     {
                         return P;
                     }
-                case 16:
+                case -17:
                     {
                         return Q;
                     }
-                case 17:
+                case -18:
                     {
                         return R;
                     }
-                case 18:
+                case -19:
                     {
                         return S;
                     }
-                case 19:
+                case -20:
                     {
                         return T;
                     }
-                case 20:
+                case -21:
                     {
                         return U;
                     }
-                case 21:
+                case -22:
                     {
                         return V;
                     }
-                case 22:
+                case -23:
                     {
                         return W;
                     }
-                case 23:
+                case -24:
                     {
                         return X;
                     }
-                case 24:
+                case -25:
                     {
                         return Y;
                     }
-                case 25:
+                case -26:
                     {
                         return Z;
                     }
@@ -193,132 +193,132 @@ namespace Structura
         {
             switch(number)
             {
-                case 0:
+                case -1:
                     {
                         A=value;
                         break;
                     }
-                case 1:
+                case -2:
                     {
                         B=value;
                         break;
                     }
-                case 2:
+                case -3:
                     {
                         C=value;
                         break;
                     }
-                case 3:
+                case -4:
                     {
                         D=value;
                         break;
                     }
-                case 4:
+                case -5:
                     {
                         E=value;
                         break;
                     }
-                case 5:
+                case -6:
                     {
                         F=value;
                         break;
                     }
-                case 6:
+                case -7:
                     {
                         G=value;
                         break;
                     }
-                case 7:
+                case -8:
                     {
                         H=value;
                         break;
                     }
-                case 8:
+                case -9:
                     {
                         I=value;
                         break;
                     }
-                case 9:
+                case -10:
                     {
                         J=value;
                         break;
                     }
-                case 10:
+                case -11:
                     {
                         K=value;
                         break;
                     }
-                case 11:
+                case -12:
                     {
                         L=value;
                         break;
                     }
-                case 12:
+                case -13:
                     {
                         M=value;
                         break;
                     }
-                case 13:
+                case -14:
                     {
                         N=value;
                         break;
                     }
-                case 14:
+                case -15:
                     {
                         O=value;
                         break;
                     }
-                case 15:
+                case -16:
                     {
                         P=value;
                         break;
                     }
-                case 16:
+                case -17:
                     {
                         Q=value;
                         break;
                     }
-                case 17:
+                case -18:
                     {
                         R=value;
                         break;
                     }
-                case 18:
+                case -19:
                     {
                         S=value;
                         break;
                     }
-                case 19:
+                case -20:
                     {
                         T=value;
                         break;
                     }
-                case 20:
+                case -21:
                     {
                         U=value;
                         break;
                     }
-                case 21:
+                case -22:
                     {
                         V=value;
                         break;
                     }
-                case 22:
+                case -23:
                     {
                         W=value;
                         break;
                     }
-                case 23:
+                case -24:
                     {
                         X=value;
                         break;
                     }
-                case 24:
+                case -25:
                     {
                         Y=value;
                         break;
                     }
-                case 25:
+                case -26:
                     {
                         Z=value;
                         break;
@@ -444,12 +444,15 @@ namespace Structura
 					}
                 case 2: //COPY
                     {
-                        Int64 copyMode=GetNextInstructionWord();
+						Int64 copyMode=GetNextInstructionWord();
+                        Int64 sourceAdress=GetNextInstructionWord();
+						Int64 targetAdress=GetNextInstructionWord();
 
                         Int64 sourceValue;
 
-                        if(copyMode==0||copyMode==1) //First value is register
+						if(sourceAdress<0) //First value is register
                         {
+							//if(copyMode==1||copyMode=3)
                             sourceValue=GetRegisterValue(GetNextInstructionWord());
                         }
                         else
@@ -457,7 +460,7 @@ namespace Structura
                             sourceValue=Memory.Data[GetNextInstructionWord()];
                         }
 
-                        if(copyMode==0||copyMode==2) //Second value is register
+						if(targetAdress<0) //Second value is register
                         {
                             Int64 targetRegister=GetNextInstructionWord();
                             SetRegisterValue(targetRegister, sourceValue);

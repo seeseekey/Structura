@@ -7,118 +7,124 @@ namespace Structura
 {
     public class Assembler
     {
-        #region Common
-        static Int64 GetRegisterNumber(string number)
+		#region Common
+		static bool IsRegister(string registerOrAdress)
+		{
+			if(registerOrAdress.ToUpper()[0]>='A'&&registerOrAdress.ToUpper()[0]<='Z') return true;
+			else return false;
+		}
+
+        static Int64 GetRegisterNumber(string register)
         {
-            switch(number.ToUpper())
+            switch(register.ToUpper())
             {
                 case "A":
                     {
-                        return 0;
+                        return -1;
                     }
                 case "B":
                     {
-                        return 1;
+                        return -2;
                     }
                 case "C":
                     {
-                        return 2;
+						return -3;
                     }
                 case "D":
                     {
-                        return 3;
+                        return -4;
                     }
                 case "E":
                     {
-                        return 4;
+                        return -5;
                     }
                 case "F":
                     {
-                        return 5;
+                        return -6;
                     }
                 case "G":
                     {
-                        return 6;
+                        return -7;
                     }
                 case "H":
                     {
-                        return 7;
+                        return -8;
                     }
                 case "I":
                     {
-                        return 8;
+                        return -9;
                     }
                 case "J":
                     {
-                        return 9;
+                        return -10;
                     }
                 case "K":
                     {
-                        return 10;
+                        return -11;
                     }
                 case "L":
                     {
-                        return 11;
+                        return -12;
                     }
                 case "M":
                     {
-                        return 12;
+                        return -13;
                     }
                 case "N":
                     {
-                        return 13;
+                        return -14;
                     }
                 case "O":
                     {
-                        return 14;
+                        return -15;
                     }
                 case "P":
                     {
-                        return 15;
+                        return -16;
                     }
                 case "Q":
                     {
-                        return 16;
+                        return -17;
                     }
                 case "R":
                     {
-                        return 17;
+                        return -18;
                     }
                 case "S":
                     {
-                        return 18;
+                        return -19;
                     }
                 case "T":
                     {
-                        return 19;
+                        return -20;
                     }
                 case "U":
                     {
-                        return 20;
+                        return -21;
                     }
                 case "V":
                     {
-                        return 21;
+                        return -22;
                     }
                 case "W":
                     {
-                        return 22;
+                        return -23;
                     }
                 case "X":
                     {
-                        return 23;
+                        return -24;
                     }
                 case "Y":
                     {
-                        return 24;
+                        return -25;
                     }
                 case "Z":
                     {
-                        return 25;
+                        return -26;
                     }
                 default:
                     {
-                        return 0;
+						throw new Exception("Unknown register.");
                     }
             }
         }
@@ -306,28 +312,38 @@ namespace Structura
                             }
                         case "COPY":
                             {
-                                Int64 source;
+								//COPY &A B;
+								bool firstAdressContainsTargetAdressAsValue=token[1].StartsWith("&");
+								bool secondAdressContainsTargetAdressAsValue=token[2].StartsWith("&");
+
+								token[1]=token[1].TrimStart('&');
+								token[2]=token[2].TrimStart('&');
+
+								Int64 source;
 								Int64 target;
 
-                                if(token[1].ToUpper()=="RTR"||token[1].ToUpper()=="RTM") //First value is register
-                                {
-                                    source=GetRegisterNumber(token[2]);
-                                }
-                                else //First value is memory adress
-                                {
-                                    source=GetRegisterNumber(token[2]);
-                                }
-                            
-                                if(token[1].ToUpper()=="RTR"||token[1].ToUpper()=="MTR") //Second value is register
-                                {
-                                    target=Convert.ToInt64(GetRegisterNumber(token[3]));
-                                }
-                                else //Second value is memory adress
-                                {
-                                    target=Convert.ToInt64(token[3]);
-                                }
+								if(IsRegister(token[1])) source=GetRegisterNumber(token[1]);
+								else source=Convert.ToInt64(token[1]);
 
-								instruction=GetCopyInstruction(GetCopyMode(token[1]), source, target);
+								if(IsRegister(token[2])) target=GetRegisterNumber(token[2]);
+								else target=Convert.ToInt64(token[2]);
+
+								if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==false)
+								{
+									instruction=GetCopyInstruction(0, source, target); 
+								}
+								else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==false)
+								{
+									instruction=GetCopyInstruction(1, source, target); 
+								}
+								else if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==true)
+								{
+									instruction=GetCopyInstruction(2, source, target); 
+								}
+								else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==true)
+								{
+									instruction=GetCopyInstruction(3, source, target); 
+								}
                             
                                 break;
                             }
@@ -353,7 +369,7 @@ namespace Structura
 							}
                         default:
                             {
-                                throw new Exception("Unknown opcode");
+								throw new Exception("Unknown mnemonic");
                             }
                     }
 
