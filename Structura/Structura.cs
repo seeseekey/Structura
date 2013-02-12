@@ -49,14 +49,14 @@ namespace Structura
         public bool Overflow { get; private set; }
 
         //Memory
-		Memory Memory;
-		Graphic Graphic;
+        Memory Memory;
+        Graphic Graphic;
 
         //Konstruktor
         public Structura(Memory memory, Graphic graphic)
         {
             Memory=memory;
-			Graphic=graphic;
+            Graphic=graphic;
         }
 
         //Methoden
@@ -341,34 +341,38 @@ namespace Structura
                         Int64 target=GetNextInstructionWord();
                         bool jumpConditionEntered=false;
 
-						switch(jumpCondition)
-						{
-							case 0: //NONE
-								{
-									jumpConditionEntered=true;
-									break;
-								}
-							case 1: //ZERO
-								{
-									if(Zero)jumpConditionEntered=true;
-									break;
-								}
-							case 2: //POS
-								{
-									if(Positive) jumpConditionEntered=true;
-									break;
-								}
-							case 3: //NEG
-								{
-									if(Negative) jumpConditionEntered=true;
-									break;
-								}
-							case 4: //Overflow
-								{
-									if(Overflow) jumpConditionEntered=true;
-									break;
-								}
-						}
+                        switch(jumpCondition)
+                        {
+                            case 0: //NONE
+                                {
+                                    jumpConditionEntered=true;
+                                    break;
+                                }
+                            case 1: //ZERO
+                                {
+                                    if(Zero)
+                                        jumpConditionEntered=true;
+                                    break;
+                                }
+                            case 2: //POS
+                                {
+                                    if(Positive)
+                                        jumpConditionEntered=true;
+                                    break;
+                                }
+                            case 3: //NEG
+                                {
+                                    if(Negative)
+                                        jumpConditionEntered=true;
+                                    break;
+                                }
+                            case 4: //Overflow
+                                {
+                                    if(Overflow)
+                                        jumpConditionEntered=true;
+                                    break;
+                                }
+                        }
 
                         if(jumpConditionEntered)
                         {
@@ -389,86 +393,104 @@ namespace Structura
                         }
                         break;
                     }
-				case 1: //ADD
-					{
-						Overflow=false;
+                case 1: //ADD
+                    {
+                        Overflow=false;
 
-						Int64 addMode=GetNextInstructionWord();
-						Int64 registerA=GetNextInstructionWord();
-						Int64 val=0;
+                        Int64 addMode=GetNextInstructionWord();
+                        Int64 registerA=GetNextInstructionWord();
+                        Int64 val=0;
 
-						if(addMode==0) //RAR
-						{
-							Int64 registerBValue=GetRegisterValue(GetNextInstructionWord());
+                        if(addMode==0) //RAR
+                        {
+                            Int64 registerBValue=GetRegisterValue(GetNextInstructionWord());
 
-							checked
-							{
-								try
-								{
-									val=GetRegisterValue(registerA)+registerBValue;
-								}
-								catch(OverflowException)
-								{
-									Overflow=true;
-								}
-							}
+                            checked
+                            {
+                                try
+                                {
+                                    val=GetRegisterValue(registerA)+registerBValue;
+                                }
+                                catch(OverflowException)
+                                {
+                                    Overflow=true;
+                                }
+                            }
 
-							val=GetRegisterValue(registerA)+registerBValue;
-							SetRegisterValue(registerA, val);
-						}
-						else //RAV
-						{
-							Int64 value=GetNextInstructionWord();
+                            val=GetRegisterValue(registerA)+registerBValue;
+                            SetRegisterValue(registerA, val);
+                        }
+                        else //RAV
+                        {
+                            Int64 value=GetNextInstructionWord();
 
-							checked
-							{
-								try
-								{
-									val=GetRegisterValue(registerA)+value;
-								}
-								catch(OverflowException)
-								{
-									Overflow=true;
-								}
-							}
+                            checked
+                            {
+                                try
+                                {
+                                    val=GetRegisterValue(registerA)+value;
+                                }
+                                catch(OverflowException)
+                                {
+                                    Overflow=true;
+                                }
+                            }
 
-							val=GetRegisterValue(registerA)+value;
-							SetRegisterValue(registerA, val);
-						}
+                            val=GetRegisterValue(registerA)+value;
+                            SetRegisterValue(registerA, val);
+                        }
 
-						Zero=val==0;
-						Positive=val>0;
-						Negative=val<0;
+                        Zero=val==0;
+                        Positive=val>0;
+                        Negative=val<0;
 
-						break;
-					}
+                        break;
+                    }
                 case 2: //COPY
                     {
-						Int64 copyMode=GetNextInstructionWord();
+                        Int64 copyMode=GetNextInstructionWord();
                         Int64 sourceAdress=GetNextInstructionWord();
-						Int64 targetAdress=GetNextInstructionWord();
+                        Int64 targetAdress=GetNextInstructionWord();
 
                         Int64 sourceValue;
 
-						if(sourceAdress<0) //First value is register
+                        if(sourceAdress<0) //First value is register
                         {
-							//if(copyMode==1||copyMode=3)
-                            sourceValue=GetRegisterValue(GetNextInstructionWord());
+                            if(copyMode==1||copyMode==3)
+                            {
+                                sourceValue=GetRegisterValue(sourceAdress);
+                                sourceValue=Memory.Data[sourceValue];
+                            }
+                            else
+                            {
+                                sourceValue=GetRegisterValue(sourceAdress);
+                            }
                         }
                         else
                         {
-                            sourceValue=Memory.Data[GetNextInstructionWord()];
+                            sourceValue=Memory.Data[sourceAdress];
                         }
 
-						if(targetAdress<0) //Second value is register
+                        if(targetAdress<0) //Second value is register
                         {
-                            Int64 targetRegister=GetNextInstructionWord();
-                            SetRegisterValue(targetRegister, sourceValue);
+                            Int64 targetRegister;
+
+                            if(copyMode==2||copyMode==3)
+                            {
+                                targetRegister=GetRegisterValue(targetAdress);
+                                Memory.WriteIntoMemory(sourceValue, targetRegister);
+                                sourceValue=Memory.Data[sourceValue];
+                            }
+                            else
+                            {
+                                targetRegister=targetAdress;
+                                SetRegisterValue(targetRegister, sourceValue);
+                            }
                         }
                         else
                         {
                             Int64 targetMemoryAdress=GetNextInstructionWord();
-							Memory.WriteIntoMemory(sourceValue, targetMemoryAdress);
+                            Memory.WriteIntoMemory(sourceValue, targetMemoryAdress);
                         }
 
                         break;

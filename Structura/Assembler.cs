@@ -8,11 +8,13 @@ namespace Structura
     public class Assembler
     {
 		#region Common
-		static bool IsRegister(string registerOrAdress)
-		{
-			if(registerOrAdress.ToUpper()[0]>='A'&&registerOrAdress.ToUpper()[0]<='Z') return true;
-			else return false;
-		}
+        static bool IsRegister(string registerOrAdress)
+        {
+            if(registerOrAdress.ToUpper()[0]>='A'&&registerOrAdress.ToUpper()[0]<='Z')
+                return true;
+            else
+                return false;
+        }
 
         static Int64 GetRegisterNumber(string register)
         {
@@ -28,7 +30,7 @@ namespace Structura
                     }
                 case "C":
                     {
-						return -3;
+                        return -3;
                     }
                 case "D":
                     {
@@ -124,13 +126,13 @@ namespace Structura
                     }
                 default:
                     {
-						throw new Exception("Unknown register.");
+                        throw new Exception("Unknown register.");
                     }
             }
         }
 
-		const Int64 GraphicMemoryAdress=9000000000000000000;
-		const Int64 KeyboardMemoryAdress=9100000000000000000;
+        const Int64 GraphicMemoryAdress=9000000000000000000;
+        const Int64 KeyboardMemoryAdress=9100000000000000000;
         #endregion
 
         #region JUMP
@@ -173,10 +175,10 @@ namespace Structura
                     {
                         return 3;
                     }
-				case "OVF":
-					{
-						return 4;
-					}
+                case "OVF":
+                    {
+                        return 4;
+                    }
                 default:
                     {
                         return 0;
@@ -205,15 +207,15 @@ namespace Structura
             }
         }
 
-		static Int64[] GetAddInstruction(Int64 addMode, Int64 registerNumber, Int64 target)
-		{
-			Int64[] instruction=new Int64[4];
-			instruction[0]=1;
-			instruction[1]=addMode;
-			instruction[2]=registerNumber;
-			instruction[3]=target;
-			return instruction;
-		}
+        static Int64[] GetAddInstruction(Int64 addMode, Int64 registerNumber, Int64 target)
+        {
+            Int64[] instruction=new Int64[4];
+            instruction[0]=1;
+            instruction[1]=addMode;
+            instruction[2]=registerNumber;
+            instruction[3]=target;
+            return instruction;
+        }
         #endregion
 
         #region COPY
@@ -244,23 +246,23 @@ namespace Structura
             }
         }
 
-		static Int64[] GetCopyInstruction(Int64 copyMode, Int64 source, Int64 target)
-		{
-			Int64[] instruction=new Int64[4];
-			instruction[0]=2;
-			instruction[1]=copyMode;
-			instruction[2]=source;
-			instruction[3]=target;
+        static Int64[] GetCopyInstruction(Int64 copyMode, Int64 source, Int64 target)
+        {
+            Int64[] instruction=new Int64[4];
+            instruction[0]=2;
+            instruction[1]=copyMode;
+            instruction[2]=source;
+            instruction[3]=target;
 
-			return instruction;
-		}
+            return instruction;
+        }
         #endregion
 
         public static Int64[] Assemble(string assembler)
         {
             try
             {
-				List<Int64> ret=new List<Int64>();
+                List<Int64> ret=new List<Int64>();
                 string[] lines=assembler.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach(string line in lines)
@@ -268,6 +270,8 @@ namespace Structura
                     Int64[] instruction=null;
 
                     string[] token=line.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if(token.Length==0)
+                        continue;
 
                     string instructionWord=token[0].ToUpper();
 
@@ -283,19 +287,19 @@ namespace Structura
 
                                 break;
                             }
-						case "NOOP":
-							{
-								instruction=new Int64[4];
-								instruction[0]=0;
-								instruction[1]=0; //Jumpcondition NONE
-								instruction[2]=1; //Jumpmode REL
-								instruction[3]=1; //Set IC==IC+1
+                        case "NOOP":
+                            {
+                                instruction=new Int64[4];
+                                instruction[0]=0;
+                                instruction[1]=0; //Jumpcondition NONE
+                                instruction[2]=1; //Jumpmode REL
+                                instruction[3]=1; //Set IC==IC+1
 
-								break;
-							}
+                                break;
+                            }
                         case "ADD":
                             {
-								Int64 target=0;
+                                Int64 target=0;
 
                                 if(token[1].ToUpper()=="RAR") //Register and register
                                 {
@@ -306,70 +310,74 @@ namespace Structura
                                     target=Convert.ToInt64(token[3]);
                                 }
 
-								instruction=GetAddInstruction(GetAddMode(token[1]), GetRegisterNumber(token[2]), target);
+                                instruction=GetAddInstruction(GetAddMode(token[1]), GetRegisterNumber(token[2]), target);
 
                                 break;
                             }
                         case "COPY":
                             {
-								//COPY &A B;
-								bool firstAdressContainsTargetAdressAsValue=token[1].StartsWith("&");
-								bool secondAdressContainsTargetAdressAsValue=token[2].StartsWith("&");
+                                //COPY &A B;
+                                bool firstAdressContainsTargetAdressAsValue=token[1].StartsWith("&");
+                                bool secondAdressContainsTargetAdressAsValue=token[2].StartsWith("&");
 
-								token[1]=token[1].TrimStart('&');
-								token[2]=token[2].TrimStart('&');
+                                token[1]=token[1].TrimStart('&');
+                                token[2]=token[2].TrimStart('&');
 
-								Int64 source;
-								Int64 target;
+                                Int64 source;
+                                Int64 target;
 
-								if(IsRegister(token[1])) source=GetRegisterNumber(token[1]);
-								else source=Convert.ToInt64(token[1]);
+                                if(IsRegister(token[1]))
+                                    source=GetRegisterNumber(token[1]);
+                                else
+                                    source=Convert.ToInt64(token[1]);
 
-								if(IsRegister(token[2])) target=GetRegisterNumber(token[2]);
-								else target=Convert.ToInt64(token[2]);
+                                if(IsRegister(token[2]))
+                                    target=GetRegisterNumber(token[2]);
+                                else
+                                    target=Convert.ToInt64(token[2]);
 
-								if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==false)
-								{
-									instruction=GetCopyInstruction(0, source, target); 
-								}
-								else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==false)
-								{
-									instruction=GetCopyInstruction(1, source, target); 
-								}
-								else if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==true)
-								{
-									instruction=GetCopyInstruction(2, source, target); 
-								}
-								else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==true)
-								{
-									instruction=GetCopyInstruction(3, source, target); 
-								}
+                                if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==false)
+                                {
+                                    instruction=GetCopyInstruction(0, source, target); //none
+                                }
+                                else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==false)
+                                {
+                                    instruction=GetCopyInstruction(1, source, target); //first adress contains adress
+                                }
+                                else if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==true)
+                                {
+                                    instruction=GetCopyInstruction(2, source, target); 
+                                }
+                                else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==true)
+                                {
+                                    instruction=GetCopyInstruction(3, source, target); 
+                                }
                             
                                 break;
                             }
-						case "DEC":
-							{
-								instruction=GetAddInstruction(1, GetRegisterNumber(token[1]), -1); //RAV Register Value
-								break;
-							}
-						case "INC":
-							{
-								instruction=GetAddInstruction(1, GetRegisterNumber(token[1]), 1); //RAV Register Value
-								break;
-							}
-						case "LOAD":
-							{
-								instruction=GetCopyInstruction(2, Convert.ToInt64(token[1]), GetRegisterNumber(token[2])); //MTR Memory Register
-								break;
-							}
-						case "WRITE":
-							{
-								instruction=GetCopyInstruction(1, GetRegisterNumber(token[1]), Convert.ToInt64(token[2])); //RTM Register Memory
-								break;
-							}
+                        case "DEC":
+                            {
+                                instruction=GetAddInstruction(1, GetRegisterNumber(token[1]), -1); //RAV Register Value
+                                break;
+                            }
+                        case "INC":
+                            {
+                                instruction=GetAddInstruction(1, GetRegisterNumber(token[1]), 1); //RAV Register Value
+                                break;
+                            }
+                        case "LOAD":
+                            {
+                                instruction=GetCopyInstruction(2, Convert.ToInt64(token[1]), GetRegisterNumber(token[2])); //MTR Memory Register
+                                break;
+                            }
+                        case "WRITE":
+                            {
+                                instruction=GetCopyInstruction(1, GetRegisterNumber(token[1]), Convert.ToInt64(token[2])); //RTM Register Memory
+                                break;
+                            }
                         default:
                             {
-								throw new Exception("Unknown mnemonic");
+                                throw new Exception("Unknown mnemonic");
                             }
                     }
 
