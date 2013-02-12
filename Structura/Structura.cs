@@ -12,35 +12,35 @@ namespace Structura
     public class Structura
     {
         //Register A - Z
-        public UInt64 A { get; private set; }
-        public UInt64 B { get; private set; }
-        public UInt64 C { get; private set; }
-        public UInt64 D { get; private set; }
-        public UInt64 E { get; private set; }
-        public UInt64 F { get; private set; }
-        public UInt64 G { get; private set; }
-        public UInt64 H { get; private set; }
-        public UInt64 I { get; private set; }
-        public UInt64 J { get; private set; }
-        public UInt64 K { get; private set; }
-        public UInt64 L { get; private set; }
-        public UInt64 M { get; private set; }
-        public UInt64 N { get; private set; }
-        public UInt64 O { get; private set; }
-        public UInt64 P { get; private set; }
-        public UInt64 Q { get; private set; }
-        public UInt64 R { get; private set; }
-        public UInt64 S { get; private set; }
-        public UInt64 T { get; private set; }
-        public UInt64 U { get; private set; }
-        public UInt64 V { get; private set; }
-        public UInt64 W { get; private set; }
-        public UInt64 X { get; private set; }
-        public UInt64 Y { get; private set; }
-        public UInt64 Z { get; private set; }
+        public Int64 A { get; private set; }
+        public Int64 B { get; private set; }
+        public Int64 C { get; private set; }
+        public Int64 D { get; private set; }
+        public Int64 E { get; private set; }
+        public Int64 F { get; private set; }
+        public Int64 G { get; private set; }
+        public Int64 H { get; private set; }
+        public Int64 I { get; private set; }
+        public Int64 J { get; private set; }
+        public Int64 K { get; private set; }
+        public Int64 L { get; private set; }
+        public Int64 M { get; private set; }
+        public Int64 N { get; private set; }
+        public Int64 O { get; private set; }
+        public Int64 P { get; private set; }
+        public Int64 Q { get; private set; }
+        public Int64 R { get; private set; }
+        public Int64 S { get; private set; }
+        public Int64 T { get; private set; }
+        public Int64 U { get; private set; }
+        public Int64 V { get; private set; }
+        public Int64 W { get; private set; }
+        public Int64 X { get; private set; }
+        public Int64 Y { get; private set; }
+        public Int64 Z { get; private set; }
 
         //Spezialregister
-        public UInt64 IC { get; private set; } //Instruction counter
+        public Int64 IC { get; private set; } //Instruction counter
 
         //Flags
         public bool Zero { get; private set; }
@@ -63,18 +63,18 @@ namespace Structura
         public void Execute()
         {
             //... IC -> Speicher -> ausführen
-            UInt64 instructionWord=GetNextInstructionWord();
+            Int64 instructionWord=GetNextInstructionWord();
             ExecuteMachineCode(instructionWord);
         }
 
-        UInt64 GetNextInstructionWord()
+        Int64 GetNextInstructionWord()
         {
-            UInt64 ret=BitConverter.ToUInt64(Memory.Data, (int)IC);
+            Int64 ret=BitConverter.ToInt64(Memory.Data, (int)IC);
             IC+=8;
             return ret;
         }
 
-        UInt64 GetRegisterValue(UInt64 number)
+        Int64 GetRegisterValue(Int64 number)
         {
             switch(number)
             {
@@ -189,7 +189,7 @@ namespace Structura
             }
         }
 
-        void SetRegisterValue(UInt64 number, UInt64 value)
+        void SetRegisterValue(Int64 number, Int64 value)
         {
             switch(number)
             {
@@ -330,15 +330,15 @@ namespace Structura
             }
         }
 
-        void ExecuteMachineCode(UInt64 instructionWord)
+        void ExecuteMachineCode(Int64 instructionWord)
         {
             switch(instructionWord)
             {
                 case 0: //JUMP
                     {
-                        UInt64 jumpCondition=GetNextInstructionWord();
-                        UInt64 jumpMode=GetNextInstructionWord();
-                        UInt64 target=GetNextInstructionWord();
+                        Int64 jumpCondition=GetNextInstructionWord();
+                        Int64 jumpMode=GetNextInstructionWord();
+                        Int64 target=GetNextInstructionWord();
                         bool jumpConditionEntered=false;
 
 						switch(jumpCondition)
@@ -393,13 +393,13 @@ namespace Structura
 					{
 						Overflow=false;
 
-						UInt64 addMode=GetNextInstructionWord();
-						UInt64 registerA=GetNextInstructionWord();
-						UInt64 val=0;
+						Int64 addMode=GetNextInstructionWord();
+						Int64 registerA=GetNextInstructionWord();
+						Int64 val=0;
 
 						if(addMode==0) //RAR
 						{
-							UInt64 registerBValue=GetRegisterValue(GetNextInstructionWord());
+							Int64 registerBValue=GetRegisterValue(GetNextInstructionWord());
 
 							checked
 							{
@@ -418,7 +418,7 @@ namespace Structura
 						}
 						else //RAV
 						{
-							UInt64 value=GetNextInstructionWord();
+							Int64 value=GetNextInstructionWord();
 
 							checked
 							{
@@ -444,9 +444,9 @@ namespace Structura
 					}
                 case 2: //COPY
                     {
-                        UInt64 copyMode=GetNextInstructionWord();
+                        Int64 copyMode=GetNextInstructionWord();
 
-                        UInt64 sourceValue;
+                        Int64 sourceValue;
 
                         if(copyMode==0||copyMode==1) //First value is register
                         {
@@ -459,12 +459,12 @@ namespace Structura
 
                         if(copyMode==0||copyMode==2) //Second value is register
                         {
-                            UInt64 targetRegister=GetNextInstructionWord();
+                            Int64 targetRegister=GetNextInstructionWord();
                             SetRegisterValue(targetRegister, sourceValue);
                         }
                         else
                         {
-                            UInt64 targetMemoryAdress=GetNextInstructionWord();
+                            Int64 targetMemoryAdress=GetNextInstructionWord();
 							Memory.WriteIntoMemory(sourceValue, targetMemoryAdress);
                         }
 

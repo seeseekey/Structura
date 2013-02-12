@@ -51,7 +51,7 @@ namespace Structura
 			File.ReadAllText(args[0]);
 			string asmCode=File.ReadAllText(args[0]);
 				
-            UInt64[] machineCode=Assembler.Assemble(asmCode);
+            Int64[] machineCode=Assembler.Assemble(asmCode);
 			memory.WriteIntoMemory(machineCode, 0);
 
             while(true)

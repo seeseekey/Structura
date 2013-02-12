@@ -8,7 +8,7 @@ namespace Structura
     public class Assembler
     {
         #region Common
-        static UInt64 GetRegisterNumber(string number)
+        static Int64 GetRegisterNumber(string number)
         {
             switch(number.ToUpper())
             {
@@ -123,12 +123,12 @@ namespace Structura
             }
         }
 
-		const UInt64 GraphicMemoryAdress=18000000000000000000;
-		const UInt64 KeyboardMemoryAdress=18100000000000008192;
+		const Int64 GraphicMemoryAdress=9000000000000000000;
+		const Int64 KeyboardMemoryAdress=9100000000000000000;
         #endregion
 
         #region JUMP
-        static UInt64 GetJumpMode(string mode)
+        static Int64 GetJumpMode(string mode)
         {
             switch(mode.ToUpper())
             {
@@ -147,7 +147,7 @@ namespace Structura
             }
         }
 
-        static UInt64 GetJumpCondition(string condition)
+        static Int64 GetJumpCondition(string condition)
         {
             switch(condition.ToUpper())
             {
@@ -180,7 +180,7 @@ namespace Structura
         #endregion
 
         #region ADD
-        static UInt64 GetAddMode(string mode)
+        static Int64 GetAddMode(string mode)
         {
             switch(mode.ToUpper())
             {
@@ -199,9 +199,9 @@ namespace Structura
             }
         }
 
-		static UInt64[] GetAddInstruction(UInt64 addMode, UInt64 registerNumber, UInt64 target)
+		static Int64[] GetAddInstruction(Int64 addMode, Int64 registerNumber, Int64 target)
 		{
-			UInt64[] instruction=new UInt64[4];
+			Int64[] instruction=new Int64[4];
 			instruction[0]=1;
 			instruction[1]=addMode;
 			instruction[2]=registerNumber;
@@ -211,7 +211,7 @@ namespace Structura
         #endregion
 
         #region COPY
-        static UInt64 GetCopyMode(string mode)
+        static Int64 GetCopyMode(string mode)
         {
             switch(mode.ToUpper())
             {
@@ -238,9 +238,9 @@ namespace Structura
             }
         }
 
-		static UInt64[] GetCopyInstruction(UInt64 copyMode, UInt64 source, UInt64 target)
+		static Int64[] GetCopyInstruction(Int64 copyMode, Int64 source, Int64 target)
 		{
-			UInt64[] instruction=new UInt64[4];
+			Int64[] instruction=new Int64[4];
 			instruction[0]=2;
 			instruction[1]=copyMode;
 			instruction[2]=source;
@@ -250,16 +250,16 @@ namespace Structura
 		}
         #endregion
 
-        public static UInt64[] Assemble(string assembler)
+        public static Int64[] Assemble(string assembler)
         {
             try
             {
-                List<UInt64> ret=new List<ulong>();
+				List<Int64> ret=new List<Int64>();
                 string[] lines=assembler.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach(string line in lines)
                 {
-                    UInt64[] instruction=null;
+                    Int64[] instruction=null;
 
                     string[] token=line.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -269,17 +269,17 @@ namespace Structura
                     {
                         case "JUMP":
                             {
-                                instruction=new UInt64[4];
+                                instruction=new Int64[4];
                                 instruction[0]=0;
                                 instruction[1]=GetJumpCondition(token[1]);
                                 instruction[2]=GetJumpMode(token[2]);
-                                instruction[3]=Convert.ToUInt64(token[3]);
+                                instruction[3]=Convert.ToInt64(token[3]);
 
                                 break;
                             }
 						case "NOOP":
 							{
-								instruction=new UInt64[4];
+								instruction=new Int64[4];
 								instruction[0]=0;
 								instruction[1]=0; //Jumpcondition NONE
 								instruction[2]=1; //Jumpmode REL
@@ -289,15 +289,15 @@ namespace Structura
 							}
                         case "ADD":
                             {
-								UInt64 target=0;
+								Int64 target=0;
 
                                 if(token[1].ToUpper()=="RAR") //Register and register
                                 {
-                                    target=Convert.ToUInt64(GetRegisterNumber(token[3]));
+                                    target=Convert.ToInt64(GetRegisterNumber(token[3]));
                                 }
                                 else //Register and value
                                 {
-                                    target=Convert.ToUInt64(token[3]);
+                                    target=Convert.ToInt64(token[3]);
                                 }
 
 								instruction=GetAddInstruction(GetAddMode(token[1]), GetRegisterNumber(token[2]), target);
@@ -306,8 +306,8 @@ namespace Structura
                             }
                         case "COPY":
                             {
-                                UInt64 source;
-								UInt64 target;
+                                Int64 source;
+								Int64 target;
 
                                 if(token[1].ToUpper()=="RTR"||token[1].ToUpper()=="RTM") //First value is register
                                 {
@@ -320,11 +320,11 @@ namespace Structura
                             
                                 if(token[1].ToUpper()=="RTR"||token[1].ToUpper()=="MTR") //Second value is register
                                 {
-                                    target=Convert.ToUInt64(GetRegisterNumber(token[3]));
+                                    target=Convert.ToInt64(GetRegisterNumber(token[3]));
                                 }
                                 else //Second value is memory adress
                                 {
-                                    target=Convert.ToUInt64(token[3]);
+                                    target=Convert.ToInt64(token[3]);
                                 }
 
 								instruction=GetCopyInstruction(GetCopyMode(token[1]), source, target);
@@ -343,12 +343,12 @@ namespace Structura
 							}
 						case "LOAD":
 							{
-								instruction=GetCopyInstruction(2, Convert.ToUInt64(token[1]), GetRegisterNumber(token[2])); //MTR Memory Register
+								instruction=GetCopyInstruction(2, Convert.ToInt64(token[1]), GetRegisterNumber(token[2])); //MTR Memory Register
 								break;
 							}
 						case "WRITE":
 							{
-								instruction=GetCopyInstruction(1, GetRegisterNumber(token[1]), Convert.ToUInt64(token[2])); //RTM Register Memory
+								instruction=GetCopyInstruction(1, GetRegisterNumber(token[1]), Convert.ToInt64(token[2])); //RTM Register Memory
 								break;
 							}
                         default:

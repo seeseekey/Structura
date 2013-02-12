@@ -14,14 +14,14 @@ namespace Structura
 			Data=new byte[8192]; //8 Kilobyte
 		}
 
-		public void WriteIntoMemory(UInt64 machineCode, UInt64 offset)
+		public void WriteIntoMemory(Int64 machineCode, Int64 offset)
 		{
-			UInt64[] array=new UInt64[1];
+			Int64[] array=new Int64[1];
 			array[0]=machineCode;
 			WriteIntoMemory(array, offset);
 		}
 
-		public void WriteIntoMemory(UInt64[] machineCode, UInt64 offset)
+		public void WriteIntoMemory(Int64[] machineCode, Int64 offset)
 		{
 			for(int i=0; i<machineCode.Length; i++)
 			{
