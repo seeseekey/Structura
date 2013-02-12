@@ -333,7 +333,7 @@ namespace Structura
                             }
 						case "DEC":
 							{
-								//instruction=GetAddInstruction(1, GetRegisterNumber(token[1]), -1); //RAV Register Value
+								instruction=GetAddInstruction(1, GetRegisterNumber(token[1]), -1); //RAV Register Value
 								break;
 							}
 						case "INC":
