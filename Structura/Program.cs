@@ -9,15 +9,15 @@ namespace Structura
 {
     class Program
     {
-		static UInt64 cycles=0;
+        static UInt64 cycles=0;
 
         static void PrintInternalStates(Structura cpu)
         {
             Console.Clear();
 
             Console.WriteLine("Structura System v13.02");
-			Console.WriteLine("");
-			Console.WriteLine("Cycles: {0}", cycles);
+            Console.WriteLine("");
+            Console.WriteLine("Cycles: {0}", cycles);
             Console.WriteLine("");
             Console.WriteLine("Register:");
             Console.WriteLine("A: {0}, B: {1}, C: {2}, D: {3}, E: {4}, F: {5}, G: {6}, H: {7}", cpu.A, cpu.B, cpu.C, cpu.D, cpu.E, cpu.F, cpu.G, cpu.H);
@@ -34,34 +34,34 @@ namespace Structura
 
         static void Main(string[] args)
         {
-			if(args.Length<1)
-			{
-				Console.WriteLine("Need assembler file.");
-				return;
-			}
+            if(args.Length<1)
+            {
+                Console.WriteLine("Need assembler file.");
+                return;
+            }
 
-			if(!File.Exists(args[0]))
-			{
-				Console.WriteLine("File don't exists.");
-				return;
-			}
+            if(!File.Exists(args[0]))
+            {
+                Console.WriteLine("File don't exists.");
+                return;
+            }
 
             Memory memory=new Memory();
-			Graphic graphic=new Graphic();
+            Graphic graphic=new Graphic();
 
-			Structura cpu=new Structura(memory, graphic);
+            Structura cpu=new Structura(memory, graphic);
 
-			File.ReadAllText(args[0]);
-			string[] asmCode=File.ReadAllLines(args[0]);
+            File.ReadAllText(args[0]);
+            string[] asmCode=File.ReadAllLines(args[0]);
 				
             Int64[] machineCode=Assembler.Assemble(asmCode);
-			memory.WriteData(0, machineCode);
+            memory.WriteData(0, machineCode);
 
             while(true)
             {
                 PrintInternalStates(cpu);
                 cpu.Execute();
-				cycles++;
+                cycles++;
                 Thread.Sleep(1000);
             }
         }
