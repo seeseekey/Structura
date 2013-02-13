@@ -245,20 +245,36 @@ namespace Structura
         }
         #endregion
 
-        public static Int64[] Assemble(string assembler)
+        public static Int64[] Assemble(string[] assembler)
         {
+#if! DEBUG
             try
             {
+#endif
                 List<Int64> ret=new List<Int64>();
-                string[] lines=assembler.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+				//Kommentare entfernen und assembler code zusammenbauen
+				string preprocessedCode="";
+				for(int i=0; i<assembler.Length; i++)
+				{
+					if(assembler[i].IndexOf("//")!=-1)
+					{
+						preprocessedCode+=assembler[i].Substring(0, assembler[i].IndexOf("//")).Trim();
+					}
+					else
+					{
+						preprocessedCode+=assembler[i].Trim();
+					}
+				}
+
+				string[] lines=preprocessedCode.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach(string line in lines)
                 {
                     Int64[] instruction=null;
 
-                    string[] token=line.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    if(token.Length==0)
-                        continue;
+					string[] token=line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if(token.Length==0) continue;
 
                     string instructionWord=token[0].ToUpper();
 
@@ -266,11 +282,18 @@ namespace Structura
                     {
                         case "JUMP":
                             {
-                                instruction=new Int64[4];
-                                instruction[0]=0;
-                                instruction[1]=GetJumpCondition(token[1]);
-                                instruction[2]=GetJumpMode(token[2]);
-                                instruction[3]=Convert.ToInt64(token[3]);
+								bool adressContainsTargetAdressAsValue=token[1].StartsWith("&");
+								token[1]=token[1].TrimStart('&');
+
+                                instruction=new Int64[5];
+								instruction[0]=0;
+
+								if(adressContainsTargetAdressAsValue) instruction[1]=1;
+								else instruction[1]=0;
+
+                                instruction[2]=GetJumpCondition(token[1]);
+                                instruction[3]=GetJumpMode(token[2]);
+                                instruction[4]=Convert.ToInt64(token[3]);
 
                                 break;
                             }
@@ -306,7 +329,6 @@ namespace Structura
                             }
                         case "COPY":
                             {
-                                //COPY &A B;
                                 bool firstAdressContainsTargetAdressAsValue=token[1].StartsWith("&");
                                 bool secondAdressContainsTargetAdressAsValue=token[2].StartsWith("&");
 
@@ -371,11 +393,13 @@ namespace Structura
                 }
 
                 return ret.ToArray();
+#if! DEBUG
             }
             catch(Exception ex)
             {
                 throw ex;
             }
+#endif
         }
     }
 }

@@ -49,7 +49,7 @@ namespace Structura
 			Structura cpu=new Structura(memory, graphic);
 
 			File.ReadAllText(args[0]);
-			string asmCode=File.ReadAllText(args[0]);
+			string[] asmCode=File.ReadAllLines(args[0]);
 				
             Int64[] machineCode=Assembler.Assemble(asmCode);
 			memory.WriteIntoMemory(machineCode, 0);
