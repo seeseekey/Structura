@@ -7,26 +7,38 @@ namespace Structura
 {
 	public class Memory
 	{
-		public byte[] Data { get; private set; }
+		byte[] data;// { get; private set; }
 
 		public Memory()
 		{
-			Data=new byte[8192]; //8 Kilobyte
+			data=new byte[8192]; //8 Kilobyte
 		}
 
-		public void WriteIntoMemory(Int64 machineCode, Int64 offset)
+		public byte[] GetData(Int64 offset, Int64 count)
 		{
-			Int64[] array=new Int64[1];
-			array[0]=machineCode;
-			WriteIntoMemory(array, offset);
+			byte[] ret=new byte[count];
+			Array.Copy(data, 0, ret, 0, count);
+			return ret;
 		}
 
-		public void WriteIntoMemory(Int64[] machineCode, Int64 offset)
+		public void WriteData(Int64 offset, byte[] bytes)
+		{
+			Array.Copy(bytes, 0, data, (int)offset, bytes.Length);
+		}
+
+		//public void WriteData(Int64 machineCode, Int64 offset)
+		//{
+		//    Int64[] array=new Int64[1];
+		//    array[0]=machineCode;
+		//    WriteData(offset, array);
+		//}
+
+		public void WriteData(Int64 offset, Int64[] machineCode)
 		{
 			for(int i=0; i<machineCode.Length; i++)
 			{
 				byte[] i64=BitConverter.GetBytes(machineCode[i]);
-				Array.Copy(i64, 0, Data, (int)(offset)+i*8, 8);
+				Array.Copy(i64, 0, data, (int)(offset)+i*8, 8);
 			}
 		}
 	}

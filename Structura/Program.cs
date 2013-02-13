@@ -52,7 +52,7 @@ namespace Structura
 			string[] asmCode=File.ReadAllLines(args[0]);
 				
             Int64[] machineCode=Assembler.Assemble(asmCode);
-			memory.WriteIntoMemory(machineCode, 0);
+			memory.WriteData(0, machineCode);
 
             while(true)
             {

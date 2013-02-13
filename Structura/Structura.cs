@@ -69,7 +69,8 @@ namespace Structura
 
         Int64 GetNextInstructionWord()
         {
-            Int64 ret=BitConverter.ToInt64(Memory.Data, (int)IC);
+			byte[] bytes=Memory.GetData((int)IC, 8);
+			Int64 ret=BitConverter.ToInt64(bytes, (int)IC);
             IC+=8;
             return ret;
         }
@@ -457,23 +458,23 @@ namespace Structura
                         Int64 sourceAdress=GetNextInstructionWord();
                         Int64 targetAdress=GetNextInstructionWord();
 
-                        Int64 sourceValue;
+                        byte[] sourceValue;//=new byte[count];
 
                         if(sourceAdress<0) //First value is register
                         {
                             if(copyMode==1||copyMode==3)
                             {
-                                sourceValue=GetRegisterValue(sourceAdress);
-                                sourceValue=Memory.Data[sourceValue];
+                                Int64 registerValue=GetRegisterValue(sourceAdress);
+								sourceValue=Memory.GetData(registerValue, count);
                             }
                             else
                             {
-                                sourceValue=GetRegisterValue(sourceAdress);
+								sourceValue=BitConverter.GetBytes(GetRegisterValue(sourceAdress));
                             }
                         }
                         else
                         {
-                            sourceValue=Memory.Data[sourceAdress];
+							sourceValue=Memory.GetData(sourceAdress, count);
                         }
 
                         if(targetAdress<0) //Second value is register
@@ -483,19 +484,18 @@ namespace Structura
                             if(copyMode==2||copyMode==3)
                             {
                                 targetRegister=GetRegisterValue(targetAdress);
-                                Memory.WriteIntoMemory(sourceValue, targetRegister);
-                                sourceValue=Memory.Data[sourceValue];
+								Memory.WriteData(targetRegister, sourceValue);
                             }
                             else
                             {
                                 targetRegister=targetAdress;
-                                SetRegisterValue(targetRegister, sourceValue);
+								SetRegisterValue(targetRegister, BitConverter.ToInt64(sourceValue, 0));
                             }
                         }
                         else
                         {
                             Int64 targetMemoryAdress=GetNextInstructionWord();
-                            Memory.WriteIntoMemory(sourceValue, targetMemoryAdress);
+							Memory.WriteData(targetMemoryAdress, sourceValue);
                         }
 
                         break;
