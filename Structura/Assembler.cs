@@ -10,10 +10,8 @@ namespace Structura
 		#region Common
         static bool IsRegister(string registerOrAdress)
         {
-            if(registerOrAdress.ToUpper()[0]>='A'&&registerOrAdress.ToUpper()[0]<='Z')
-                return true;
-            else
-                return false;
+            if(registerOrAdress.ToUpper()[0]>='A'&&registerOrAdress.ToUpper()[0]<='Z') return true;
+            else return false;
         }
 
         static Int64 GetRegisterNumber(string register)
@@ -136,55 +134,87 @@ namespace Structura
         #endregion
 
         #region JUMP
-        static Int64 GetJumpMode(string mode)
+		enum AdressInterpretation
+		{
+			AdressNotContainsTargetAdressAsValue=0,
+			AdressContainsTargetAdressAsValue=1
+		}
+
+		enum JumpCondition
+		{
+			None=0,
+			Zero=1,
+			Positive=2,
+			Negative=3,
+			Overflow=4
+		}
+
+		enum JumpMode
+		{
+			Absolute=0,
+			Relative=1
+		}
+
+		static JumpMode GetJumpMode(string mode)
         {
             switch(mode.ToUpper())
             {
                 case "ABS":
                     {
-                        return 0;
+						return JumpMode.Absolute;
                     }
                 case "REL":
                     {
-                        return 1;
+						return JumpMode.Relative;
                     }
                 default:
                     {
-                        return 0;
+						throw new Exception("Unkown jump mode");
                     }
             }
         }
 
-        static Int64 GetJumpCondition(string condition)
+		static JumpCondition GetJumpCondition(string condition)
         {
             switch(condition.ToUpper())
             {
                 case "NONE":
                     {
-                        return 0;
+						return JumpCondition.None;
                     }
                 case "ZERO":
                     {
-                        return 1;
+						return JumpCondition.Zero;
                     }
                 case "POS":
                     {
-                        return 2;
+						return JumpCondition.Positive;
                     }
                 case "NEG":
                     {
-                        return 3;
+						return JumpCondition.Negative;
                     }
                 case "OVF":
                     {
-                        return 4;
+						return JumpCondition.Overflow;
                     }
                 default:
                     {
-                        return 0;
+						throw new Exception("Unkown jump condition");
                     }
             }
         }
+
+		static Int64[] GetJumpInstruction(AdressInterpretation adressInterpretation, JumpCondition jumpCondition, JumpMode jumpMode, Int64 target)
+		{
+			Int64[] instruction=new Int64[5];
+			instruction[0]=0;
+			instruction[1]=(Int64)adressInterpretation;
+			instruction[2]=(Int64)jumpCondition;
+			instruction[3]=(Int64)jumpMode;
+			instruction[4]=target;
+			return instruction;
+		}
         #endregion
 
         #region ADD
@@ -265,6 +295,8 @@ namespace Structura
                         case "JUMP":
                             {
 								bool adressContainsTargetAdressAsValue=token[3].StartsWith("*");
+								AdressInterpretation adressInterpretation=adressContainsTargetAdressAsValue?AdressInterpretation.AdressContainsTargetAdressAsValue:AdressInterpretation.AdressNotContainsTargetAdressAsValue;
+
 								token[3]=token[3].TrimStart('*');
 
                                 instruction=new Int64[5];
@@ -273,17 +305,21 @@ namespace Structura
 								if(adressContainsTargetAdressAsValue) instruction[1]=1;
 								else instruction[1]=0;
 
-                                instruction[2]=GetJumpCondition(token[1]);
-                                instruction[3]=GetJumpMode(token[2]);
+                                JumpCondition jumpCondition=GetJumpCondition(token[1]);
+                                JumpMode jumpMode=GetJumpMode(token[2]);
+								Int64 target;
 
 								if(IsRegister(token[3]))
 								{
-									instruction[4]=GetRegisterNumber(token[3]);
+									target=GetRegisterNumber(token[3]);
 								}
 								else //Normale adresse
 								{
-									instruction[4]=Convert.ToInt64(token[3]);
+									target=Convert.ToInt64(token[3]);
 								}
+
+								instruction=GetJumpInstruction(adressInterpretation, jumpCondition, jumpMode, target);
+								ret.AddRange(instruction);
 
                                 break;
                             }
@@ -296,6 +332,8 @@ namespace Structura
                                 instruction[3]=1; //Jumpmode REL
                                 instruction[4]=1; //Set IC==IC+1
 
+								ret.AddRange(instruction);
+
                                 break;
                             }
                         case "ADD":
@@ -305,7 +343,7 @@ namespace Structura
 
 								if(IsRegister(token[2])) //Register and register
                                 {
-                                    target=Convert.ToInt64(GetRegisterNumber(token[3]));
+                                    target=Convert.ToInt64(GetRegisterNumber(token[2]));
 									addMode=AddMode.RegisterAndRegister;
                                 }
                                 else //Register and value
@@ -316,8 +354,51 @@ namespace Structura
 
 								instruction=GetAddInstruction(addMode, GetRegisterNumber(token[1]), target);
 
+								ret.AddRange(instruction);
+
                                 break;
                             }
+						case "MUL":
+							{
+								Int64 target=0;
+								AddMode addMode;
+
+								if(IsRegister(token[2])) //Register and register
+								{
+									target=Convert.ToInt64(GetRegisterNumber(token[2]));
+									addMode=AddMode.RegisterAndRegister;
+								}
+								else //Register and value
+								{
+									target=Convert.ToInt64(token[2]);
+									addMode=AddMode.RegisterAndValue;
+								}
+
+								if(addMode==AddMode.RegisterAndValue)
+								{
+									for(int i=0; i<target; i++)
+									{
+										instruction=GetAddInstruction(addMode, GetRegisterNumber(token[1]), target);
+										ret.AddRange(instruction);
+									}
+								}
+								else //Register and Register
+								{
+									instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z")); //Kopiere nach Z
+									ret.AddRange(instruction);
+
+									instruction=GetAddInstruction(addMode, GetRegisterNumber(token[1]), GetRegisterNumber(token[1])); //Source + Source
+									ret.AddRange(instruction);
+
+									instruction=GetAddInstruction(addMode, GetRegisterNumber("Z"), -1); //DEC Z 1
+									ret.AddRange(instruction);
+
+									instruction=GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -18); //Bedingter Sprung wenn Z>0;
+									ret.AddRange(instruction);
+								}
+
+								break;
+							}
                         case "COPY":
                             {
 								Int64 count=Convert.ToInt64(token[1]);
@@ -353,27 +434,33 @@ namespace Structura
                                 {
 									instruction=GetCopyInstruction(CopyMode.BothAdressContainsTargetAdressAsValue, count, source, target); 
                                 }
+
+								ret.AddRange(instruction);
                             
                                 break;
                             }
                         case "DEC":
                             {
                                 instruction=GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), -1); //RAV Register Value
+								ret.AddRange(instruction);
                                 break;
                             }
                         case "INC":
                             {
 								instruction=GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 1); //RAV Register Value
+								ret.AddRange(instruction);
                                 break;
                             }
                         case "LOAD":
                             {
 								instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, Convert.ToInt64(token[1]), GetRegisterNumber(token[2])); //MTR Memory Register
+								ret.AddRange(instruction);
                                 break;
                             }
                         case "WRITE":
                             {
 								instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(token[1]), Convert.ToInt64(token[2])); //RTM Register Memory
+								ret.AddRange(instruction);
                                 break;
                             }
                         default:
@@ -381,8 +468,6 @@ namespace Structura
                                 throw new Exception("Unknown mnemonic");
                             }
                     }
-
-                    ret.AddRange(instruction);
                 }
 
                 return ret.ToArray();
