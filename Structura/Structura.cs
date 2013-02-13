@@ -344,7 +344,7 @@ namespace Structura
 						Int64 target=GetNextInstructionWord();
 						if(adressMode==1) //Adress contains target adress as value
 						{
-							target=Memory.Data[target];
+							target=GetRegisterValue(target);
 						}
 
                         bool jumpConditionEntered=false;
@@ -453,6 +453,7 @@ namespace Structura
                 case 2: //COPY
                     {
                         Int64 copyMode=GetNextInstructionWord();
+						Int64 count=GetNextInstructionWord();
                         Int64 sourceAdress=GetNextInstructionWord();
                         Int64 targetAdress=GetNextInstructionWord();
 

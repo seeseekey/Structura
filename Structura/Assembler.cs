@@ -214,13 +214,14 @@ namespace Structura
 			BothAdressContainsTargetAdressAsValue=3
 		}
 
-		static Int64[] GetCopyInstruction(CopyMode copyMode, Int64 source, Int64 target)
+		static Int64[] GetCopyInstruction(CopyMode copyMode, Int64 count, Int64 source, Int64 target)
         {
-            Int64[] instruction=new Int64[4];
+            Int64[] instruction=new Int64[5];
             instruction[0]=2;
             instruction[1]=(Int64)copyMode;
-            instruction[2]=source;
-            instruction[3]=target;
+			instruction[2]=count;
+            instruction[3]=source;
+            instruction[4]=target;
 
             return instruction;
         }
@@ -263,8 +264,8 @@ namespace Structura
                     {
                         case "JUMP":
                             {
-								bool adressContainsTargetAdressAsValue=token[1].StartsWith("&");
-								token[1]=token[1].TrimStart('&');
+								bool adressContainsTargetAdressAsValue=token[3].StartsWith("*");
+								token[3]=token[3].TrimStart('*');
 
                                 instruction=new Int64[5];
 								instruction[0]=0;
@@ -274,7 +275,15 @@ namespace Structura
 
                                 instruction[2]=GetJumpCondition(token[1]);
                                 instruction[3]=GetJumpMode(token[2]);
-                                instruction[4]=Convert.ToInt64(token[3]);
+
+								if(IsRegister(token[3]))
+								{
+									instruction[4]=GetRegisterNumber(token[3]);
+								}
+								else //Normale adresse
+								{
+									instruction[4]=Convert.ToInt64(token[3]);
+								}
 
                                 break;
                             }
@@ -311,36 +320,38 @@ namespace Structura
                             }
                         case "COPY":
                             {
-                                bool firstAdressContainsTargetAdressAsValue=token[1].StartsWith("&");
-                                bool secondAdressContainsTargetAdressAsValue=token[2].StartsWith("&");
+								Int64 count=Convert.ToInt64(token[1]);
 
-                                token[1]=token[1].TrimStart('&');
-                                token[2]=token[2].TrimStart('&');
+								bool firstAdressContainsTargetAdressAsValue=token[2].StartsWith("*");
+								bool secondAdressContainsTargetAdressAsValue=token[3].StartsWith("*");
+
+								token[2]=token[2].TrimStart('*');
+								token[3]=token[3].TrimStart('*');
 
                                 Int64 source;
                                 Int64 target;
 
-                                if(IsRegister(token[1])) source=GetRegisterNumber(token[1]);
-                                else source=Convert.ToInt64(token[1]);
+                                if(IsRegister(token[2])) source=GetRegisterNumber(token[2]);
+                                else source=Convert.ToInt64(token[2]);
 
-                                if(IsRegister(token[2])) target=GetRegisterNumber(token[2]);
-                                else target=Convert.ToInt64(token[2]);
+                                if(IsRegister(token[3])) target=GetRegisterNumber(token[3]);
+                                else target=Convert.ToInt64(token[3]);
 
                                 if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==false)
                                 {
-									instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, source, target); //none
+									instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, count, source, target); //none
                                 }
                                 else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==false)
                                 {
-									instruction=GetCopyInstruction(CopyMode.FirstAdressContainsTargetAdressAsValue, source, target); //first adress contains adress
+									instruction=GetCopyInstruction(CopyMode.FirstAdressContainsTargetAdressAsValue, count, source, target); //first adress contains adress
                                 }
                                 else if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==true)
                                 {
-									instruction=GetCopyInstruction(CopyMode.SecondAdressContainsTargetAdressAsValue, source, target); 
+									instruction=GetCopyInstruction(CopyMode.SecondAdressContainsTargetAdressAsValue, count, source, target); 
                                 }
                                 else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==true)
                                 {
-									instruction=GetCopyInstruction(CopyMode.BothAdressContainsTargetAdressAsValue, source, target); 
+									instruction=GetCopyInstruction(CopyMode.BothAdressContainsTargetAdressAsValue, count, source, target); 
                                 }
                             
                                 break;
@@ -357,12 +368,12 @@ namespace Structura
                             }
                         case "LOAD":
                             {
-								instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, Convert.ToInt64(token[1]), GetRegisterNumber(token[2])); //MTR Memory Register
+								instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, Convert.ToInt64(token[1]), GetRegisterNumber(token[2])); //MTR Memory Register
                                 break;
                             }
                         case "WRITE":
                             {
-								instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, GetRegisterNumber(token[1]), Convert.ToInt64(token[2])); //RTM Register Memory
+								instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(token[1]), Convert.ToInt64(token[2])); //RTM Register Memory
                                 break;
                             }
                         default:
