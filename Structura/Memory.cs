@@ -17,7 +17,7 @@ namespace Structura
 		public byte[] GetData(Int64 offset, Int64 count)
 		{
 			byte[] ret=new byte[count];
-			Array.Copy(data, 0, ret, 0, count);
+			Array.Copy(data, offset, ret, 0, count);
 			return ret;
 		}
 

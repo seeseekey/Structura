@@ -70,7 +70,7 @@ namespace Structura
         Int64 GetNextInstructionWord()
         {
 			byte[] bytes=Memory.GetData((int)IC, 8);
-			Int64 ret=BitConverter.ToInt64(bytes, (int)IC);
+			Int64 ret=BitConverter.ToInt64(bytes, 0);
             IC+=8;
             return ret;
         }
