@@ -126,7 +126,7 @@ namespace Structura
                     }
                 default:
                     {
-                        throw new Exception("Unknown register.");
+                        throw new Exception("Unknown register");
                     }
             }
         }
@@ -206,38 +206,19 @@ namespace Structura
         #endregion
 
         #region COPY
-        static Int64 GetCopyMode(string mode)
-        {
-            switch(mode.ToUpper())
-            {
-                case "RTR":
-                    {
-                        return 0;
-                    }
-                case "RTM":
-                    {
-                        return 1;
-                    }
-                case "MTR":
-                    {
-                        return 2;
-                    }
-                case "MTM":
-                    {
-                        return 3;
-                    }
-                default:
-                    {
-                        return 0;
-                    }
-            }
-        }
+		enum CopyMode
+		{
+			NoAdressContainsTargetAdressAsValue=0,
+			FirstAdressContainsTargetAdressAsValue=1,
+			SecondAdressContainsTargetAdressAsValue=2,
+			BothAdressContainsTargetAdressAsValue=3
+		}
 
-        static Int64[] GetCopyInstruction(Int64 copyMode, Int64 source, Int64 target)
+		static Int64[] GetCopyInstruction(CopyMode copyMode, Int64 source, Int64 target)
         {
             Int64[] instruction=new Int64[4];
             instruction[0]=2;
-            instruction[1]=copyMode;
+            instruction[1]=(Int64)copyMode;
             instruction[2]=source;
             instruction[3]=target;
 
@@ -323,7 +304,7 @@ namespace Structura
 									addMode=AddMode.RegisterAndValue;
                                 }
 
-								instruction=GetAddInstruction(addMode, GetRegisterNumber(token[2]), target);
+								instruction=GetAddInstruction(addMode, GetRegisterNumber(token[1]), target);
 
                                 break;
                             }
@@ -346,19 +327,19 @@ namespace Structura
 
                                 if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==false)
                                 {
-                                    instruction=GetCopyInstruction(0, source, target); //none
+									instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, source, target); //none
                                 }
                                 else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==false)
                                 {
-                                    instruction=GetCopyInstruction(1, source, target); //first adress contains adress
+									instruction=GetCopyInstruction(CopyMode.FirstAdressContainsTargetAdressAsValue, source, target); //first adress contains adress
                                 }
                                 else if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==true)
                                 {
-                                    instruction=GetCopyInstruction(2, source, target); 
+									instruction=GetCopyInstruction(CopyMode.SecondAdressContainsTargetAdressAsValue, source, target); 
                                 }
                                 else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==true)
                                 {
-                                    instruction=GetCopyInstruction(3, source, target); 
+									instruction=GetCopyInstruction(CopyMode.BothAdressContainsTargetAdressAsValue, source, target); 
                                 }
                             
                                 break;
@@ -375,12 +356,12 @@ namespace Structura
                             }
                         case "LOAD":
                             {
-                                instruction=GetCopyInstruction(2, Convert.ToInt64(token[1]), GetRegisterNumber(token[2])); //MTR Memory Register
+								instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, Convert.ToInt64(token[1]), GetRegisterNumber(token[2])); //MTR Memory Register
                                 break;
                             }
                         case "WRITE":
                             {
-                                instruction=GetCopyInstruction(1, GetRegisterNumber(token[1]), Convert.ToInt64(token[2])); //RTM Register Memory
+								instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, GetRegisterNumber(token[1]), Convert.ToInt64(token[2])); //RTM Register Memory
                                 break;
                             }
                         default:
