@@ -9,11 +9,15 @@ namespace Structura
 {
     class Program
     {
+		static UInt64 cycles=0;
+
         static void PrintInternalStates(Structura cpu)
         {
             Console.Clear();
 
             Console.WriteLine("Structura System v13.02");
+			Console.WriteLine("");
+			Console.WriteLine("Cycles: {0}", cycles);
             Console.WriteLine("");
             Console.WriteLine("Register:");
             Console.WriteLine("A: {0}, B: {1}, C: {2}, D: {3}, E: {4}, F: {5}, G: {6}, H: {7}", cpu.A, cpu.B, cpu.C, cpu.D, cpu.E, cpu.F, cpu.G, cpu.H);
@@ -26,7 +30,6 @@ namespace Structura
             Console.WriteLine("");
             Console.WriteLine("Flags:");
             Console.WriteLine("Zero: {0}, Positive: {1}, Negative: {2}, Overflow: {3}", cpu.Zero, cpu.Positive, cpu.Negative, cpu.Overflow);
-            Console.WriteLine("");
         }
 
         static void Main(string[] args)
@@ -58,6 +61,7 @@ namespace Structura
             {
                 PrintInternalStates(cpu);
                 cpu.Execute();
+				cycles++;
                 Thread.Sleep(1000);
             }
         }
