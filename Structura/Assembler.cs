@@ -188,30 +188,17 @@ namespace Structura
         #endregion
 
         #region ADD
-        static Int64 GetAddMode(string mode)
-        {
-            switch(mode.ToUpper())
-            {
-                case "RAR":
-                    {
-                        return 0;
-                    }
-                case "RAV":
-                    {
-                        return 1;
-                    }
-                default:
-                    {
-                        return 0;
-                    }
-            }
-        }
+		enum AddMode
+		{
+			RegisterAndRegister=0,
+			RegisterAndValue=1
+		}
 
-        static Int64[] GetAddInstruction(Int64 addMode, Int64 registerNumber, Int64 target)
+		static Int64[] GetAddInstruction(AddMode addMode, Int64 registerNumber, Int64 target)
         {
             Int64[] instruction=new Int64[4];
             instruction[0]=1;
-            instruction[1]=addMode;
+            instruction[1]=(Int64)addMode;
             instruction[2]=registerNumber;
             instruction[3]=target;
             return instruction;
@@ -300,17 +287,20 @@ namespace Structura
                         case "ADD":
                             {
                                 Int64 target=0;
+								AddMode addMode;
 
-                                if(token[1].ToUpper()=="RAR") //Register and register
+								if(IsRegister(token[2])) //Register and register
                                 {
                                     target=Convert.ToInt64(GetRegisterNumber(token[3]));
+									addMode=AddMode.RegisterAndRegister;
                                 }
                                 else //Register and value
                                 {
-                                    target=Convert.ToInt64(token[3]);
+                                    target=Convert.ToInt64(token[2]);
+									addMode=AddMode.RegisterAndValue;
                                 }
 
-                                instruction=GetAddInstruction(GetAddMode(token[1]), GetRegisterNumber(token[2]), target);
+								instruction=GetAddInstruction(addMode, GetRegisterNumber(token[2]), target);
 
                                 break;
                             }
@@ -326,15 +316,11 @@ namespace Structura
                                 Int64 source;
                                 Int64 target;
 
-                                if(IsRegister(token[1]))
-                                    source=GetRegisterNumber(token[1]);
-                                else
-                                    source=Convert.ToInt64(token[1]);
+                                if(IsRegister(token[1])) source=GetRegisterNumber(token[1]);
+                                else source=Convert.ToInt64(token[1]);
 
-                                if(IsRegister(token[2]))
-                                    target=GetRegisterNumber(token[2]);
-                                else
-                                    target=Convert.ToInt64(token[2]);
+                                if(IsRegister(token[2])) target=GetRegisterNumber(token[2]);
+                                else target=Convert.ToInt64(token[2]);
 
                                 if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==false)
                                 {
@@ -357,12 +343,12 @@ namespace Structura
                             }
                         case "DEC":
                             {
-                                instruction=GetAddInstruction(1, GetRegisterNumber(token[1]), -1); //RAV Register Value
+                                instruction=GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), -1); //RAV Register Value
                                 break;
                             }
                         case "INC":
                             {
-                                instruction=GetAddInstruction(1, GetRegisterNumber(token[1]), 1); //RAV Register Value
+								instruction=GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 1); //RAV Register Value
                                 break;
                             }
                         case "LOAD":
