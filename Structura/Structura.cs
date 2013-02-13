@@ -336,43 +336,47 @@ namespace Structura
             {
                 case 0: //JUMP
                     {
+						Int64 adressMode=GetNextInstructionWord();
                         Int64 jumpCondition=GetNextInstructionWord();
                         Int64 jumpMode=GetNextInstructionWord();
-                        Int64 target=GetNextInstructionWord();
+                        
+						//Calc target
+						Int64 target=GetNextInstructionWord();
+						if(adressMode==1) //Adress contains target adress as value
+						{
+							target=Memory.Data[target];
+						}
+
                         bool jumpConditionEntered=false;
 
-                        switch(jumpCondition)
-                        {
-                            case 0: //NONE
-                                {
-                                    jumpConditionEntered=true;
-                                    break;
-                                }
-                            case 1: //ZERO
-                                {
-                                    if(Zero)
-                                        jumpConditionEntered=true;
-                                    break;
-                                }
-                            case 2: //POS
-                                {
-                                    if(Positive)
-                                        jumpConditionEntered=true;
-                                    break;
-                                }
-                            case 3: //NEG
-                                {
-                                    if(Negative)
-                                        jumpConditionEntered=true;
-                                    break;
-                                }
-                            case 4: //Overflow
-                                {
-                                    if(Overflow)
-                                        jumpConditionEntered=true;
-                                    break;
-                                }
-                        }
+						switch(jumpCondition)
+						{
+							case 0: //NONE
+								{
+									jumpConditionEntered=true;
+									break;
+								}
+							case 1: //ZERO
+								{
+									if(Zero) jumpConditionEntered=true;
+									break;
+								}
+							case 2: //POS
+								{
+									if(Positive) jumpConditionEntered=true;
+									break;
+								}
+							case 3: //NEG
+								{
+									if(Negative) jumpConditionEntered=true;
+									break;
+								}
+							case 4: //Overflow
+								{
+									if(Overflow) jumpConditionEntered=true;
+									break;
+								}
+						}
 
                         if(jumpConditionEntered)
                         {

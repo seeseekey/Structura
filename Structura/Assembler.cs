@@ -280,11 +280,12 @@ namespace Structura
                             }
                         case "NOOP":
                             {
-                                instruction=new Int64[4];
+                                instruction=new Int64[5];
                                 instruction[0]=0;
-                                instruction[1]=0; //Jumpcondition NONE
-                                instruction[2]=1; //Jumpmode REL
-                                instruction[3]=1; //Set IC==IC+1
+								instruction[1]=0; //Adress not contains target adress as value
+                                instruction[2]=0; //Jumpcondition NONE
+                                instruction[3]=1; //Jumpmode REL
+                                instruction[4]=1; //Set IC==IC+1
 
                                 break;
                             }
