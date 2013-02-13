@@ -46,10 +46,12 @@ namespace Structura
                 return;
             }
 
-            Memory memory=new Memory();
             Graphic graphic=new Graphic();
 
-            Structura cpu=new Structura(memory, graphic);
+            Memory memory=new Memory();
+            memory.AddOverlayDevice(graphic);
+
+            Structura cpu=new Structura(memory);
 
             File.ReadAllText(args[0]);
             string[] asmCode=File.ReadAllLines(args[0]);

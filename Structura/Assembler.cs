@@ -134,9 +134,6 @@ namespace Structura
                     }
             }
         }
-
-        const Int64 GraphicMemoryAdress=9000000000000000000;
-        const Int64 KeyboardMemoryAdress=9100000000000000000;
         #endregion
 
         #region JUMP

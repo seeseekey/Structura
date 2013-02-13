@@ -50,13 +50,11 @@ namespace Structura
 
         //Memory
         Memory Memory;
-        Graphic Graphic;
 
         //Konstruktor
-        public Structura(Memory memory, Graphic graphic)
+        public Structura(Memory memory)
         {
             Memory=memory;
-            Graphic=graphic;
         }
 
         //Methoden
@@ -69,130 +67,130 @@ namespace Structura
 
         Int64 GetNextInstructionWord()
         {
-			byte[] bytes=Memory.GetData((int)IC, 8);
-			Int64 ret=BitConverter.ToInt64(bytes, 0);
+            byte[] bytes=Memory.GetData((int)IC, 8);
+            Int64 ret=BitConverter.ToInt64(bytes, 0);
             IC+=8;
             return ret;
         }
 
-		Int64 GetRegisterValue(Int64 number)
-		{
-			switch(number)
-			{
-				case -1:
-					{
-						return A;
-					}
-				case -2:
-					{
-						return B;
-					}
-				case -3:
-					{
-						return C;
-					}
-				case -4:
-					{
-						return D;
-					}
-				case -5:
-					{
-						return E;
-					}
-				case -6:
-					{
-						return F;
-					}
-				case -7:
-					{
-						return G;
-					}
-				case -8:
-					{
-						return H;
-					}
-				case -9:
-					{
-						return I;
-					}
-				case -10:
-					{
-						return J;
-					}
-				case -11:
-					{
-						return K;
-					}
-				case -12:
-					{
-						return L;
-					}
-				case -13:
-					{
-						return M;
-					}
-				case -14:
-					{
-						return N;
-					}
-				case -15:
-					{
-						return O;
-					}
-				case -16:
-					{
-						return P;
-					}
-				case -17:
-					{
-						return Q;
-					}
-				case -18:
-					{
-						return R;
-					}
-				case -19:
-					{
-						return S;
-					}
-				case -20:
-					{
-						return T;
-					}
-				case -21:
-					{
-						return U;
-					}
-				case -22:
-					{
-						return V;
-					}
-				case -23:
-					{
-						return W;
-					}
-				case -24:
-					{
-						return X;
-					}
-				case -25:
-					{
-						return Y;
-					}
-				case -26:
-					{
-						return Z;
-					}
-				case -27:
-					{
-						return 0; //ZERO ROM
-					}
-				default:
-					{
-						throw new Exception("Unknown register number");
-					}
-			}
-		}
+        Int64 GetRegisterValue(Int64 number)
+        {
+            switch(number)
+            {
+                case -1:
+                    {
+                        return A;
+                    }
+                case -2:
+                    {
+                        return B;
+                    }
+                case -3:
+                    {
+                        return C;
+                    }
+                case -4:
+                    {
+                        return D;
+                    }
+                case -5:
+                    {
+                        return E;
+                    }
+                case -6:
+                    {
+                        return F;
+                    }
+                case -7:
+                    {
+                        return G;
+                    }
+                case -8:
+                    {
+                        return H;
+                    }
+                case -9:
+                    {
+                        return I;
+                    }
+                case -10:
+                    {
+                        return J;
+                    }
+                case -11:
+                    {
+                        return K;
+                    }
+                case -12:
+                    {
+                        return L;
+                    }
+                case -13:
+                    {
+                        return M;
+                    }
+                case -14:
+                    {
+                        return N;
+                    }
+                case -15:
+                    {
+                        return O;
+                    }
+                case -16:
+                    {
+                        return P;
+                    }
+                case -17:
+                    {
+                        return Q;
+                    }
+                case -18:
+                    {
+                        return R;
+                    }
+                case -19:
+                    {
+                        return S;
+                    }
+                case -20:
+                    {
+                        return T;
+                    }
+                case -21:
+                    {
+                        return U;
+                    }
+                case -22:
+                    {
+                        return V;
+                    }
+                case -23:
+                    {
+                        return W;
+                    }
+                case -24:
+                    {
+                        return X;
+                    }
+                case -25:
+                    {
+                        return Y;
+                    }
+                case -26:
+                    {
+                        return Z;
+                    }
+                case -27:
+                    {
+                        return 0; //ZERO ROM
+                    }
+                default:
+                    {
+                        throw new Exception("Unknown register number");
+                    }
+            }
+        }
 
         void SetRegisterValue(Int64 number, Int64 value)
         {
@@ -341,47 +339,51 @@ namespace Structura
             {
                 case 0: //JUMP
                     {
-						Int64 adressMode=GetNextInstructionWord();
+                        Int64 adressMode=GetNextInstructionWord();
                         Int64 jumpCondition=GetNextInstructionWord();
                         Int64 jumpMode=GetNextInstructionWord();
                         
-						//Calc target
-						Int64 target=GetNextInstructionWord();
-						if(adressMode==1) //Adress contains target adress as value
-						{
-							target=GetRegisterValue(target);
-						}
+                        //Calc target
+                        Int64 target=GetNextInstructionWord();
+                        if(adressMode==1) //Adress contains target adress as value
+                        {
+                            target=GetRegisterValue(target);
+                        }
 
                         bool jumpConditionEntered=false;
 
-						switch(jumpCondition)
-						{
-							case 0: //NONE
-								{
-									jumpConditionEntered=true;
-									break;
-								}
-							case 1: //ZERO
-								{
-									if(Zero) jumpConditionEntered=true;
-									break;
-								}
-							case 2: //POS
-								{
-									if(Positive) jumpConditionEntered=true;
-									break;
-								}
-							case 3: //NEG
-								{
-									if(Negative) jumpConditionEntered=true;
-									break;
-								}
-							case 4: //Overflow
-								{
-									if(Overflow) jumpConditionEntered=true;
-									break;
-								}
-						}
+                        switch(jumpCondition)
+                        {
+                            case 0: //NONE
+                                {
+                                    jumpConditionEntered=true;
+                                    break;
+                                }
+                            case 1: //ZERO
+                                {
+                                    if(Zero)
+                                        jumpConditionEntered=true;
+                                    break;
+                                }
+                            case 2: //POS
+                                {
+                                    if(Positive)
+                                        jumpConditionEntered=true;
+                                    break;
+                                }
+                            case 3: //NEG
+                                {
+                                    if(Negative)
+                                        jumpConditionEntered=true;
+                                    break;
+                                }
+                            case 4: //Overflow
+                                {
+                                    if(Overflow)
+                                        jumpConditionEntered=true;
+                                    break;
+                                }
+                        }
 
                         if(jumpConditionEntered)
                         {
@@ -458,7 +460,7 @@ namespace Structura
                 case 2: //COPY
                     {
                         Int64 copyMode=GetNextInstructionWord();
-						Int64 count=GetNextInstructionWord();
+                        Int64 count=GetNextInstructionWord();
                         Int64 sourceAdress=GetNextInstructionWord();
                         Int64 targetAdress=GetNextInstructionWord();
 
@@ -469,16 +471,16 @@ namespace Structura
                             if(copyMode==1||copyMode==3)
                             {
                                 Int64 registerValue=GetRegisterValue(sourceAdress);
-								sourceValue=Memory.GetData(registerValue, count);
+                                sourceValue=Memory.GetData(registerValue, count);
                             }
                             else
                             {
-								sourceValue=BitConverter.GetBytes(GetRegisterValue(sourceAdress));
+                                sourceValue=BitConverter.GetBytes(GetRegisterValue(sourceAdress));
                             }
                         }
                         else
                         {
-							sourceValue=Memory.GetData(sourceAdress, count);
+                            sourceValue=Memory.GetData(sourceAdress, count);
                         }
 
                         if(targetAdress<0) //Second value is register
@@ -488,18 +490,18 @@ namespace Structura
                             if(copyMode==2||copyMode==3)
                             {
                                 targetRegister=GetRegisterValue(targetAdress);
-								Memory.WriteData(targetRegister, sourceValue);
+                                Memory.WriteData(targetRegister, sourceValue);
                             }
                             else
                             {
                                 targetRegister=targetAdress;
-								SetRegisterValue(targetRegister, BitConverter.ToInt64(sourceValue, 0));
+                                SetRegisterValue(targetRegister, BitConverter.ToInt64(sourceValue, 0));
                             }
                         }
                         else
                         {
                             Int64 targetMemoryAdress=GetNextInstructionWord();
-							Memory.WriteData(targetMemoryAdress, sourceValue);
+                            Memory.WriteData(targetMemoryAdress, sourceValue);
                         }
 
                         break;
