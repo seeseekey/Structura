@@ -57,7 +57,16 @@ namespace Structura
             string[] asmCode=File.ReadAllLines(args[0]);
 				
             Int64[] machineCode=Assembler.Assemble(asmCode);
-            memory.WriteData(0, machineCode);
+            byte[] machineCodeAsByteArray=new byte[machineCode.Length*8];
+
+            //Kopiere Int64 Array in ByteArray
+            for(int i=0;i<machineCode.Length;i++)
+            {
+                byte[] i64=BitConverter.GetBytes(machineCode[i]);
+                Array.Copy(i64, 0, machineCodeAsByteArray, i*8, 8);
+            }
+
+            memory.WriteData(0, machineCodeAsByteArray);
 
             while(true)
             {
