@@ -356,9 +356,9 @@ namespace Structura
 
 								if(addMode==AddMode.RegisterAndValue)
 								{
-									for(int i=0; i<target; i++)
+									for(int i=0; i<target-1; i++)
 									{
-										ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber(token[1]), target));
+										ret.AddRange(GetAddInstruction(AddMode.RegisterAndRegister, GetRegisterNumber(token[1]), GetRegisterNumber(token[1])));
 									}
 								}
 								else //Register and Register
@@ -367,9 +367,9 @@ namespace Structura
 
 									ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber(token[1]), GetRegisterNumber(token[1]))); //Source + Source
 
-									ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber("Z"), -1)); //DEC Z 1
-
-									ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -18)); //Bedingter Sprung wenn Z>0;
+									ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -104
+									
+									ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -104)); //Bedingter Sprung wenn Z>0;
 								}
 
 								break;
