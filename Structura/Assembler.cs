@@ -283,8 +283,6 @@ namespace Structura
 
                 foreach(string line in lines)
                 {
-                    Int64[] instruction=null;
-
 					string[] token=line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                     if(token.Length==0) continue;
 
@@ -299,12 +297,6 @@ namespace Structura
 
 								token[3]=token[3].TrimStart('*');
 
-                                instruction=new Int64[5];
-								instruction[0]=0;
-
-								if(adressContainsTargetAdressAsValue) instruction[1]=1;
-								else instruction[1]=0;
-
                                 JumpCondition jumpCondition=GetJumpCondition(token[1]);
                                 JumpMode jumpMode=GetJumpMode(token[2]);
 								Int64 target;
@@ -318,22 +310,13 @@ namespace Structura
 									target=Convert.ToInt64(token[3]);
 								}
 
-								instruction=GetJumpInstruction(adressInterpretation, jumpCondition, jumpMode, target);
-								ret.AddRange(instruction);
+								ret.AddRange(GetJumpInstruction(adressInterpretation, jumpCondition, jumpMode, target));
 
                                 break;
                             }
                         case "NOOP":
                             {
-                                instruction=new Int64[5];
-                                instruction[0]=0;
-								instruction[1]=0; //Adress not contains target adress as value
-                                instruction[2]=0; //Jumpcondition NONE
-                                instruction[3]=1; //Jumpmode REL
-                                instruction[4]=1; //Set IC==IC+1
-
-								ret.AddRange(instruction);
-
+								ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
                                 break;
                             }
                         case "ADD":
@@ -352,10 +335,7 @@ namespace Structura
 									addMode=AddMode.RegisterAndValue;
                                 }
 
-								instruction=GetAddInstruction(addMode, GetRegisterNumber(token[1]), target);
-
-								ret.AddRange(instruction);
-
+								ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber(token[1]), target));
                                 break;
                             }
 						case "MUL":
@@ -378,23 +358,18 @@ namespace Structura
 								{
 									for(int i=0; i<target; i++)
 									{
-										instruction=GetAddInstruction(addMode, GetRegisterNumber(token[1]), target);
-										ret.AddRange(instruction);
+										ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber(token[1]), target));
 									}
 								}
 								else //Register and Register
 								{
-									instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z")); //Kopiere nach Z
-									ret.AddRange(instruction);
+									ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
 
-									instruction=GetAddInstruction(addMode, GetRegisterNumber(token[1]), GetRegisterNumber(token[1])); //Source + Source
-									ret.AddRange(instruction);
+									ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber(token[1]), GetRegisterNumber(token[1]))); //Source + Source
 
-									instruction=GetAddInstruction(addMode, GetRegisterNumber("Z"), -1); //DEC Z 1
-									ret.AddRange(instruction);
+									ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber("Z"), -1)); //DEC Z 1
 
-									instruction=GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -18); //Bedingter Sprung wenn Z>0;
-									ret.AddRange(instruction);
+									ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -18)); //Bedingter Sprung wenn Z>0;
 								}
 
 								break;
@@ -420,47 +395,41 @@ namespace Structura
 
                                 if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==false)
                                 {
-									instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, count, source, target); //none
+									ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, count, source, target)); //none
                                 }
                                 else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==false)
                                 {
-									instruction=GetCopyInstruction(CopyMode.FirstAdressContainsTargetAdressAsValue, count, source, target); //first adress contains adress
+									ret.AddRange(GetCopyInstruction(CopyMode.FirstAdressContainsTargetAdressAsValue, count, source, target)); //first adress contains adress
                                 }
                                 else if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==true)
                                 {
-									instruction=GetCopyInstruction(CopyMode.SecondAdressContainsTargetAdressAsValue, count, source, target); 
+									ret.AddRange(GetCopyInstruction(CopyMode.SecondAdressContainsTargetAdressAsValue, count, source, target)); 
                                 }
                                 else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==true)
                                 {
-									instruction=GetCopyInstruction(CopyMode.BothAdressContainsTargetAdressAsValue, count, source, target); 
+									ret.AddRange(GetCopyInstruction(CopyMode.BothAdressContainsTargetAdressAsValue, count, source, target)); 
                                 }
 
-								ret.AddRange(instruction);
-                            
                                 break;
                             }
                         case "DEC":
                             {
-                                instruction=GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), -1); //RAV Register Value
-								ret.AddRange(instruction);
+                                ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), -1)); //RAV Register Value
                                 break;
                             }
                         case "INC":
                             {
-								instruction=GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 1); //RAV Register Value
-								ret.AddRange(instruction);
+								ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 1)); //RAV Register Value
                                 break;
                             }
                         case "LOAD":
                             {
-								instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, Convert.ToInt64(token[1]), GetRegisterNumber(token[2])); //MTR Memory Register
-								ret.AddRange(instruction);
+								ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, Convert.ToInt64(token[1]), GetRegisterNumber(token[2]))); //MTR Memory Register
                                 break;
                             }
                         case "WRITE":
                             {
-								instruction=GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(token[1]), Convert.ToInt64(token[2])); //RTM Register Memory
-								ret.AddRange(instruction);
+								ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(token[1]), Convert.ToInt64(token[2]))); //RTM Register Memory
                                 break;
                             }
                         default:
