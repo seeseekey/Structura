@@ -68,10 +68,6 @@ namespace Structura
 
             memory.WriteData(0, machineCodeAsByteArray);
 
-			//Bildschirm anzeigen
-			FormScreen InstFormScreen=new FormScreen();
-			InstFormScreen.Show();
-
             while(true)
             {
                 PrintInternalStates(cpu);

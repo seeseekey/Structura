@@ -32,9 +32,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -48,12 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler.cs" />
-    <Compile Include="FormScreen.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormScreen.Designer.cs">
-      <DependentUpon>FormScreen.cs</DependentUpon>
-    </Compile>
     <Compile Include="Graphic.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="Program.cs" />
@@ -64,17 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="FormScreen.resx">
-      <DependentUpon>FormScreen.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\CSCL\CSCL\CSCL.csproj">
-      <Project>{0E720343-5366-4C3A-BC59-7B7FD2C311B5}</Project>
-      <Name>CSCL</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
