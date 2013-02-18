@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CSCL.Graphic;
 
 namespace Structura
 {
@@ -40,6 +41,13 @@ namespace Structura
             {
                 return Constants.GraphicMemoryAdressEnd;
             }
+        }
+
+        public void Display()
+        {
+            gtImage image=new gtImage(500, 500, gtImage.Format.RGB);
+            image.FillWithMandelbrot();
+            image.SaveToPNGGDI("screen.png");
         }
     }
 }

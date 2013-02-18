@@ -72,6 +72,7 @@ namespace Structura
             {
                 PrintInternalStates(cpu);
                 cpu.Execute();
+                graphic.Display();
                 cycles++;
                 Thread.Sleep(1000);
             }
