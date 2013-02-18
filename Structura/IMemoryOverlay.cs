@@ -11,4 +11,3 @@ namespace Structura
         void  WriteData(Int64 offset, byte[] bytes);
     }
 }
-
