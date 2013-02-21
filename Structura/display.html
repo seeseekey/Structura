@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <script type="text/JavaScript">
+      var x=0, y=0;
+      var canvas, context, img;
+
+      function timedRefresh(timeoutPeriod)
+      {
+        canvas = document.getElementById("x");
+        context = canvas.getContext("2d");
+        img = new Image();
+
+        img.onload = function() {
+		  context.clearRect ( 0 , 0 , 500, 500 );
+          context.drawImage(img, x, y);
+          //x+=20; y+=20;
+          setTimeout("timedRefresh("+timeoutPeriod+")",timeoutPeriod);
+		  img.destroy();
+        };
+	
+        img.src = "display.png?t=" + new Date().getTime();
+        setTimeout("timedRefresh(1000)",timeoutPeriod);
+      }
+  </script>
+  <title>Structura Display Viewer</title>
+  </head>
+  <body onload="JavaScript:timedRefresh(1000);">
+    <canvas id="x" width="500" height="500" />
+  </body>
+</html>
+

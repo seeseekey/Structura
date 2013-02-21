@@ -73,4 +73,9 @@
       <Name>CSCL</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="display.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

@@ -47,7 +47,7 @@ namespace Structura
         {
             gtImage image=new gtImage(500, 500, gtImage.Format.RGB);
             image.FillWithMandelbrot();
-            image.SaveToPNGGDI("screen.png");
+            image.SaveToPNGGDI("display.png");
         }
     }
 }
