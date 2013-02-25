@@ -57,12 +57,12 @@ namespace Structura
 
         public void Display()
         {
-            gtImage image=new gtImage(500, 500, gtImage.Format.RGB);
+			gtImage image=new gtImage((uint)width, (uint)height, gtImage.Format.RGB);
 
 			for(Int64 i=Constants.GraphicMemoryDisplayAdressStart; i<width*height; i++)
 			{
-				Int64 x=0;
-				Int64 y=0;
+				Int64 x=i%width;
+				Int64 y=i/width;
 
 				byte r=data[i+0];
 				byte g=data[i+1];

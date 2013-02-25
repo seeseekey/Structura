@@ -32,6 +32,11 @@ namespace Structura
 			Console.WriteLine("Zero: {0}, Positive: {1}, Negative: {2}, Overflow: {3}", cpu.Zero, cpu.Positive, cpu.Negative, cpu.Overflow);
 		}
 
+		static Structura cpu;
+		static Graphic graphic;
+		static int cycleInterval=1000;
+		static bool running=true;
+
 		static void Main(string[] args)
 		{
 			if(args.Length<1)
@@ -46,19 +51,21 @@ namespace Structura
 				return;
 			}
 
-			int cycleInterval=1000;
-
 			if(args.Length>1)
 			{
 				cycleInterval=Convert.ToInt32(args[1]);
 			}
 
-			Graphic graphic=new Graphic();
+			Console.CancelKeyPress+=new ConsoleCancelEventHandler(Console_CancelKeyPress);
+
+			graphic=new Graphic();
+			Keyboard keyboard=new Keyboard();
 
 			Memory memory=new Memory();
 			memory.AddOverlayDevice(graphic);
+			memory.AddOverlayDevice(keyboard);
 
-			Structura cpu=new Structura(memory);
+			cpu=new Structura(memory);
 
 			File.ReadAllText(args[0]);
 			string[] asmCode=File.ReadAllLines(args[0]);
@@ -75,7 +82,31 @@ namespace Structura
 
 			memory.WriteData(0, machineCodeAsByteArray);
 
-			while(true)
+			//execute system
+			Thread thread=new Thread(new ThreadStart(ExecuteSystem));
+			thread.Start();
+
+			//Keyboard aktivieren
+			while(running)
+			{
+				ConsoleKeyInfo keyInfo=Console.ReadKey(true);
+
+				byte modifier=(byte)keyInfo.Modifiers;
+				byte[] sign=Encoding.UTF32.GetBytes(keyInfo.KeyChar.ToString());
+
+				keyboard.AddKeyEvent(modifier, sign);
+			}
+		}
+
+		static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+		{
+			running=false;
+			e.Cancel=true; // Event abbrechen
+		}
+
+		static void ExecuteSystem()
+		{
+			while(running)
 			{
 				PrintInternalStates(cpu);
 				cpu.Execute();
