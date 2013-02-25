@@ -79,23 +79,6 @@ namespace Structura
 			throw new Exception("Unkown opcode");
 		}
 
-		static string GetJumpAdressOrValue(Int64 adressOrValue)
-		{
-			switch(adressOrValue)
-			{
-				case 0:
-					{
-						return "ABS";
-					}
-				case 1:
-					{
-						return "REL";
-					}
-			}
-
-			throw new Exception("Unkown opcode");
-		}
-
 		public static List<string> Disassemble(byte[] machineCodeAsByteArray)
 		{
 			List<string> ret=new List<string>();
@@ -115,7 +98,7 @@ namespace Structura
 							jump+=GetJumpAdressInterpretation(GetNextInstructionWord(machineCodeAsByteArray, ref IC)) + " ";
 							jump+=GetJumpMode(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
 							jump+=GetJumpAdressing(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
-							jump+=GetJumpAdressOrValue(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
+							jump+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
 
 							ret.Add(jump);
 

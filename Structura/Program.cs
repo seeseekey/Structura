@@ -4,12 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.IO;
+using CSCL;
 
 namespace Structura
 {
 	class Program
 	{
 		static UInt64 cycles=0;
+
+		static Structura cpu;
+		static Graphic graphic;
+		static int cycleInterval=1000;
+		static bool running=true;
 
 		static void PrintInternalStates(Structura cpu)
 		{
@@ -32,44 +38,48 @@ namespace Structura
 			Console.WriteLine("Zero: {0}, Positive: {1}, Negative: {2}, Overflow: {3}", cpu.Zero, cpu.Positive, cpu.Negative, cpu.Overflow);
 		}
 
-		static Structura cpu;
-		static Graphic graphic;
-		static int cycleInterval=1000;
-		static bool running=true;
+		static void ShowHelp()
+		{
+			Console.Clear();
+
+			Console.WriteLine("Structura System Help");
+			Console.WriteLine("");
+			Console.WriteLine("Structura.exe program.asm");
+			Console.WriteLine("Structura.exe program.asm -cycleInterval:1000");
+			Console.WriteLine("Structura.exe program.asm -disassemble");
+			Console.WriteLine("");
+			Console.WriteLine("Parameter:");
+			Console.WriteLine("  -file:<filename>");
+			Console.WriteLine("  -cycleInterval:<timeInMilliSeconds");
+			Console.WriteLine("  -disassemble");
+		}
 
 		static void Main(string[] args)
 		{
-			if(args.Length<1)
+			Parameters arguments=Parameters.InterpretCommandLine(args);
+
+			if(!arguments.Contains("file000")||arguments.Contains("h")||arguments.Contains("help")||arguments.Contains("?"))
 			{
-				Console.WriteLine("Need assembler file.");
-				return;
+				ShowHelp();
 			}
 
-			if(!File.Exists(args[0]))
+			string filename=arguments.GetString("file000");
+
+			if(!File.Exists(filename))
 			{
 				Console.WriteLine("File don't exists.");
 				return;
 			}
 
-			if(args.Length>1)
+			if(arguments.Contains("cycleInterval"))
 			{
-				cycleInterval=Convert.ToInt32(args[1]);
+				cycleInterval=Convert.ToInt32(arguments.GetInt32("cycleInterval"));
 			}
 
 			Console.CancelKeyPress+=new ConsoleCancelEventHandler(Console_CancelKeyPress);
 
-			graphic=new Graphic();
-			Keyboard keyboard=new Keyboard();
-
-			Memory memory=new Memory();
-			memory.AddOverlayDevice(graphic);
-			memory.AddOverlayDevice(keyboard);
-
-			cpu=new Structura(memory);
-
-			File.ReadAllText(args[0]);
-			string[] asmCode=File.ReadAllLines(args[0]);
-
+			//Assemblieren
+			string[] asmCode=File.ReadAllLines(filename);
 			Int64[] machineCode=Assembler.Assemble(asmCode);
 			byte[] machineCodeAsByteArray=new byte[machineCode.Length*8];
 
@@ -80,7 +90,29 @@ namespace Structura
 				Array.Copy(i64, 0, machineCodeAsByteArray, i*8, 8);
 			}
 
+			//Prüfe auf Disassembler
+			if(arguments.Contains("disassemble"))
+			{
+				List<string> disassembly=Disassembler.Disassemble(machineCodeAsByteArray);
+
+				foreach(string line in disassembly)
+				{
+					Console.WriteLine(line);
+				}
+
+				return;
+			}
+
+			//System initialisieren
+			graphic=new Graphic();
+			Keyboard keyboard=new Keyboard();
+
+			Memory memory=new Memory();
+			memory.AddOverlayDevice(graphic);
+			memory.AddOverlayDevice(keyboard);
 			memory.WriteData(0, machineCodeAsByteArray);
+
+			cpu=new Structura(memory);
 
 			//execute system
 			Thread thread=new Thread(new ThreadStart(ExecuteSystem));
