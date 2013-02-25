@@ -47,16 +47,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assembler.cs" />
-    <Compile Include="Disassembler.cs" />
-    <Compile Include="Graphic.cs" />
-    <Compile Include="Keyboard.cs" />
-    <Compile Include="Memory.cs" />
+    <Compile Include="Assembler\Assembler.cs" />
+    <Compile Include="Assembler\Disassembler.cs" />
+    <Compile Include="Hardware\Graphic.cs" />
+    <Compile Include="Hardware\Keyboard.cs" />
+    <Compile Include="Hardware\Memory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Structura.cs" />
+    <Compile Include="Hardware\Structura.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="IMemoryOverlay.cs" />
+    <Compile Include="Hardware\IMemoryOverlay.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -76,7 +76,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="display.html">
+    <Content Include="Hardware\display.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

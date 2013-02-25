@@ -1,6 +1,6 @@
 using System;
 
-namespace Structura
+namespace Structura.Hardware
 {
     public interface IMemoryOverlay
     {

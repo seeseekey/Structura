@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Structura
+namespace Structura.Assembler
 {
 	public static class Disassembler
 	{

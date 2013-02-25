@@ -6,7 +6,7 @@ using CSCL.Graphic;
 using System.IO;
 using System.Drawing;
 
-namespace Structura
+namespace Structura.Hardware
 {
     public class Graphic: IMemoryOverlay
     {

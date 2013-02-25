@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 using System.IO;
 using CSCL;
+using Structura.Hardware;
+using Structura.Assembler;
 
 namespace Structura
 {
@@ -12,12 +14,12 @@ namespace Structura
 	{
 		static UInt64 cycles=0;
 
-		static Structura cpu;
+		static Hardware.Structura cpu;
 		static Graphic graphic;
 		static int cycleInterval=1000;
 		static bool running=true;
 
-		static void PrintInternalStates(Structura cpu)
+		static void PrintInternalStates(Hardware.Structura cpu)
 		{
 			Console.Clear();
 
@@ -80,7 +82,7 @@ namespace Structura
 
 			//Assemblieren
 			string[] asmCode=File.ReadAllLines(filename);
-			Int64[] machineCode=Assembler.Assemble(asmCode);
+			Int64[] machineCode=Assembler.Assembler.Assemble(asmCode);
 			byte[] machineCodeAsByteArray=new byte[machineCode.Length*8];
 
 			//Kopiere Int64 Array in ByteArray
@@ -112,7 +114,7 @@ namespace Structura
 			memory.AddOverlayDevice(keyboard);
 			memory.WriteData(0, machineCodeAsByteArray);
 
-			cpu=new Structura(memory);
+			cpu=new Hardware.Structura(memory);
 
 			//execute system
 			Thread thread=new Thread(new ThreadStart(ExecuteSystem));
