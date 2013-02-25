@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Structura.Assembler.Jump;
+using Structura.Assembler.Add;
 
 namespace Structura.Assembler
 {
@@ -14,23 +16,6 @@ namespace Structura.Assembler
 			Array.Copy(data, IC, instructionWordAsBytes, 0, 8);
 			IC+=8;
 			return BitConverter.ToInt64(instructionWordAsBytes, 0);
-		}
-
-		static string GetJumpAdressInterpretation(Int64 adressInterpretation)
-		{
-			switch(adressInterpretation)
-			{
-				case 0:
-					{
-						return "ANCTAAV";
-					}
-				case 1:
-					{
-						return "ACTAAV";
-					}
-			}
-
-			throw new Exception("Unkown opcode");
 		}
 
 		static string GetJumpMode(Int64 jumpMode)
@@ -94,11 +79,28 @@ namespace Structura.Assembler
 				{
 					case 0: //JUMP
 						{
+							AdressInterpretation adressInterpretation=(AdressInterpretation)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+
 							string jump="JUMP ";
-							jump+=GetJumpAdressInterpretation(GetNextInstructionWord(machineCodeAsByteArray, ref IC)) + " ";
 							jump+=GetJumpMode(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
 							jump+=GetJumpAdressing(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
+
+							switch(adressInterpretation)
+							{
+								case AdressInterpretation.AdressNotContainsTargetAdressAsValue:
+									{
+										jump+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
+										break;
+									}
+								case AdressInterpretation.AdressContainsTargetAdressAsValue:
+									{
+										jump+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
+										break;
+									}
+							}
+
 							jump+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
+							jump+=GetJumpMode(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
 
 							ret.Add(jump);
 
@@ -106,6 +108,13 @@ namespace Structura.Assembler
 						}
 					case 1: //ADD
 						{
+							string add="ADD ";
+							AddMode addMode=(AddMode)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+							Int64 valueA=GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+							Int64 valueB=GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+
+							ret.Add(add);
+
 							break;
 						}
 					case 2: //COPY

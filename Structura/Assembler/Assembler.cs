@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Structura.Assembler.Jump;
+using Structura.Assembler.Add;
 
 namespace Structura.Assembler
 {
@@ -137,27 +139,6 @@ namespace Structura.Assembler
         #endregion
 
         #region JUMP
-        enum AdressInterpretation
-        {
-            AdressNotContainsTargetAdressAsValue=0,
-            AdressContainsTargetAdressAsValue=1
-        }
-
-        enum JumpCondition
-        {
-            None=0,
-            Zero=1,
-            Positive=2,
-            Negative=3,
-            Overflow=4
-        }
-
-        enum JumpMode
-        {
-            Absolute=0,
-            Relative=1
-        }
-
         static JumpMode GetJumpMode(string mode)
         {
             switch(mode.ToUpper())
@@ -221,12 +202,6 @@ namespace Structura.Assembler
         #endregion
 
         #region ADD
-        enum AddMode
-        {
-            RegisterAndRegister=0,
-            RegisterAndValue=1
-        }
-
         static Int64[] GetAddInstruction(AddMode addMode, Int64 registerNumber, Int64 target)
         {
             Int64[] instruction=new Int64[4];
