@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler.cs" />
+    <Compile Include="Disassembler.cs" />
     <Compile Include="Graphic.cs" />
     <Compile Include="Keyboard.cs" />
     <Compile Include="Memory.cs" />

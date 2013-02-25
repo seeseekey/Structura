@@ -383,6 +383,47 @@ namespace Structura
 
                             break;
                         }
+					case "SHIFTL":
+						{
+							Int64 target=0;
+							AddMode addMode;
+
+							if(IsRegister(token[2])) //Register and register
+							{
+								target=Convert.ToInt64(GetRegisterNumber(token[2]));
+								addMode=AddMode.RegisterAndRegister;
+							}
+							else //Register and value
+							{
+								target=Convert.ToInt64(token[2]);
+								addMode=AddMode.RegisterAndValue;
+							}
+
+							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //kopiere Register auf Y
+
+							if(addMode==AddMode.RegisterAndValue)
+							{
+								ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+								ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), target));
+							}
+							else //Register and Register
+							{
+								ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
+							}
+
+							ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
+
+							//Multiplikationsschleife
+							ret.AddRange(GetAddInstruction(AddMode.RegisterAndRegister, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //Source + Source
+							ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
+							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -104)); //Bedingter Sprung wenn Z>0;
+
+							//Bereinige Register Y und Z
+							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Y")));
+							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+
+							break;
+						}
                     case "COPY":
                         {
                             Int64 count=Convert.ToInt64(token[1]);
