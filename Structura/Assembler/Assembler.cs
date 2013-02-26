@@ -351,11 +351,11 @@ namespace Structura.Assembler
                                 ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
                             }
 
-                            ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
+                            ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
 
                             //Multiplikationsschleife
                             ret.AddRange(GetAddInstruction(AddMode.RegisterAndRegister, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //Source + Source
-                            ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
+							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
                             ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -104)); //Bedingter Sprung wenn Z>0;
 
                             //Bereinige Register Y und Z
@@ -380,7 +380,8 @@ namespace Structura.Assembler
 								addMode=AddMode.RegisterAndValue;
 							}
 
-							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //kopiere Register auf Y
+							//SHIFTL implementation
+							//ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //kopiere erstes Register auf Y
 
 							if(addMode==AddMode.RegisterAndValue)
 							{
@@ -392,7 +393,16 @@ namespace Structura.Assembler
 								ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
 							}
 
+							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Y")));
+							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
+
+							//Multiplikationsschleife
+							ret.AddRange(GetAddInstruction(AddMode.RegisterAndRegister, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //Source + Source
 							ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
+							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -104)); //Bedingter Sprung wenn Z>0;
+
+							break;
+
 
 							//Multiplikationsschleife
 							ret.AddRange(GetAddInstruction(AddMode.RegisterAndRegister, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //Source + Source
