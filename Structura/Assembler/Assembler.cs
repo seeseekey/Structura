@@ -10,13 +10,13 @@ namespace Structura.Assembler
     public class Assembler
     {
 		#region Common
-        static bool IsRegister(string registerOrAdress)
-        {
-            if(registerOrAdress.ToUpper()[0]>='A'&&registerOrAdress.ToUpper()[0]<='Z')
-                return true;
-            else
-                return false;
-        }
+		static bool IsRegister(string registerOrAdress)
+		{
+			if(registerOrAdress.ToUpper()[0]>='A'&&registerOrAdress.ToUpper()[0]<='Z')
+				return true;
+			else
+				return false;
+		}
 
         static Int64 GetRegisterNumber(string register)
         {
