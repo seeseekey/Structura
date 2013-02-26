@@ -274,11 +274,11 @@ namespace Structura.Assembler
 							string registerOrMemoryAdressAsString;
 							if(registerOrMemoryAdress<0)
 							{
-								registerOrMemoryAdressAsString=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
+								registerOrMemoryAdressAsString=GetRegisterName(registerOrMemoryAdress)+" ";
 							}
 							else
 							{
-								registerOrMemoryAdressAsString=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+" ";
+								registerOrMemoryAdressAsString=registerOrMemoryAdress+" ";
 							}
 
 							if(copyMode==CopyMode.FirstAdressContainsTargetAdressAsValue||copyMode==CopyMode.BothAdressContainsTargetAdressAsValue)
@@ -292,11 +292,11 @@ namespace Structura.Assembler
 							registerOrMemoryAdress=GetNextInstructionWord(machineCodeAsByteArray, ref IC);
 							if(registerOrMemoryAdress<0)
 							{
-								registerOrMemoryAdressAsString=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
+								registerOrMemoryAdressAsString=GetRegisterName(registerOrMemoryAdress)+";";
 							}
 							else
 							{
-								registerOrMemoryAdressAsString=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
+								registerOrMemoryAdressAsString=registerOrMemoryAdress+";";
 							}
 
 							if(copyMode==CopyMode.SecondAdressContainsTargetAdressAsValue||copyMode==CopyMode.BothAdressContainsTargetAdressAsValue)
