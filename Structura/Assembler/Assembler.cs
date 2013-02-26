@@ -228,7 +228,98 @@ namespace Structura.Assembler
         }
         #endregion
 
-        public static Int64[] Assemble(string[] assembler)
+		#region MAKRO
+		static List<Int64> GetCopy(string countAsString, string val1, string val2)
+		{
+			List<Int64> ret=new List<Int64>();
+
+			Int64 count=Convert.ToInt64(countAsString);
+
+			bool firstAdressContainsTargetAdressAsValue=val1.StartsWith("*");
+			bool secondAdressContainsTargetAdressAsValue=val2.StartsWith("*");
+
+			val1=val1.TrimStart('*');
+			val2=val2.TrimStart('*');
+
+			Int64 source;
+			Int64 target;
+
+			if(IsRegister(val1))
+				source=GetRegisterNumber(val1);
+			else
+				source=Convert.ToInt64(val1);
+
+			if(IsRegister(val2))
+				target=GetRegisterNumber(val2);
+			else
+				target=Convert.ToInt64(val2);
+
+			if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==false)
+			{
+				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, count, source, target)); //none
+			}
+			else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==false)
+			{
+				ret.AddRange(GetCopyInstruction(CopyMode.FirstAdressContainsTargetAdressAsValue, count, source, target)); //first adress contains adress
+			}
+			else if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==true)
+			{
+				ret.AddRange(GetCopyInstruction(CopyMode.SecondAdressContainsTargetAdressAsValue, count, source, target));
+			}
+			else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==true)
+			{
+				ret.AddRange(GetCopyInstruction(CopyMode.BothAdressContainsTargetAdressAsValue, count, source, target));
+			}
+
+			return ret;
+		}
+
+		static List<Int64> GetMultiplication(string val1, string val2)
+		{
+			List<Int64> ret=new List<Int64>();
+
+			Int64 target=0;
+			AddMode addMode;
+
+			if(IsRegister(val2)) //Register and register
+			{
+				target=Convert.ToInt64(GetRegisterNumber(val2));
+				addMode=AddMode.RegisterAndRegister;
+			}
+			else //Register and value
+			{
+				target=Convert.ToInt64(val2);
+				addMode=AddMode.RegisterAndValue;
+			}
+
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("Y"))); //kopiere Register auf Y
+
+			if(addMode==AddMode.RegisterAndValue)
+			{
+				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+				ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), target));
+			}
+			else //Register and Register
+			{
+				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
+			}
+
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
+
+			//Multiplikationsschleife
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndRegister, GetRegisterNumber(val1), GetRegisterNumber("Y"))); //Source + Source
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -104)); //Bedingter Sprung wenn Z>0;
+
+			//Bereinige Register Y und Z
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Y")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+
+			return ret;
+		}
+		#endregion
+
+		public static Int64[] Assemble(string[] assembler)
         {
 #if! DEBUG
             try
@@ -325,137 +416,27 @@ namespace Structura.Assembler
                         }
                     case "MUL":
                         {
-                            Int64 target=0;
-                            AddMode addMode;
-
-                            if(IsRegister(token[2])) //Register and register
-                            {
-                                target=Convert.ToInt64(GetRegisterNumber(token[2]));
-                                addMode=AddMode.RegisterAndRegister;
-                            }
-                            else //Register and value
-                            {
-                                target=Convert.ToInt64(token[2]);
-                                addMode=AddMode.RegisterAndValue;
-                            }
-
-                            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //kopiere Register auf Y
-
-                            if(addMode==AddMode.RegisterAndValue)
-                            {
-                                ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
-                                ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), target));
-                            }
-                            else //Register and Register
-                            {
-                                ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
-                            }
-
-                            ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
-
-                            //Multiplikationsschleife
-                            ret.AddRange(GetAddInstruction(AddMode.RegisterAndRegister, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //Source + Source
-							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
-                            ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -104)); //Bedingter Sprung wenn Z>0;
-
-                            //Bereinige Register Y und Z
-                            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Y")));
-                            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
-
-                            break;
+							ret.AddRange(GetMultiplication(token[1], token[2]));
+							break;
                         }
 					case "SHIFTL":
 						{
-							Int64 target=0;
-							AddMode addMode;
+							//Vorbereitung für SHIFTL
+							//ret.AddRange(GetCopy("8", "ZERO", "W")); //setze w auf 0
+							//ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), 2)); //setze w auf 2
+							ret.AddRange(GetCopy("8", token[2], "X")); //kopiere zweiten wert als zähler auf X
 
-							if(IsRegister(token[2])) //Register and register
-							{
-								target=Convert.ToInt64(GetRegisterNumber(token[2]));
-								addMode=AddMode.RegisterAndRegister;
-							}
-							else //Register and value
-							{
-								target=Convert.ToInt64(token[2]);
-								addMode=AddMode.RegisterAndValue;
-							}
+							//ret.AddRange(GetMultiplication("W", "2"));
 
-							//SHIFTL implementation
-							//ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //kopiere erstes Register auf Y
-
-							if(addMode==AddMode.RegisterAndValue)
-							{
-								ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
-								ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), target));
-							}
-							else //Register and Register
-							{
-								ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
-							}
-
-							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Y")));
-							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
-
-							//Multiplikationsschleife
-							ret.AddRange(GetAddInstruction(AddMode.RegisterAndRegister, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //Source + Source
-							ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
-							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -104)); //Bedingter Sprung wenn Z>0;
-
-							break;
-
-
-							//Multiplikationsschleife
-							ret.AddRange(GetAddInstruction(AddMode.RegisterAndRegister, GetRegisterNumber(token[1]), GetRegisterNumber("Y"))); //Source + Source
-							ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
-							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -104)); //Bedingter Sprung wenn Z>0;
-
-							//Bereinige Register Y und Z
-							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Y")));
-							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+							//ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -1)); //DEC X 1
+							//ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -104)); //Bedingter Sprung wenn X>0;
 
 							break;
 						}
                     case "COPY":
                         {
-                            Int64 count=Convert.ToInt64(token[1]);
-
-                            bool firstAdressContainsTargetAdressAsValue=token[2].StartsWith("*");
-                            bool secondAdressContainsTargetAdressAsValue=token[3].StartsWith("*");
-
-                            token[2]=token[2].TrimStart('*');
-                            token[3]=token[3].TrimStart('*');
-
-                            Int64 source;
-                            Int64 target;
-
-                            if(IsRegister(token[2]))
-                                source=GetRegisterNumber(token[2]);
-                            else
-                                source=Convert.ToInt64(token[2]);
-
-                            if(IsRegister(token[3]))
-                                target=GetRegisterNumber(token[3]);
-                            else
-                                target=Convert.ToInt64(token[3]);
-
-                            if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==false)
-                            {
-                                ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, count, source, target)); //none
-                            }
-                            else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==false)
-                            {
-                                ret.AddRange(GetCopyInstruction(CopyMode.FirstAdressContainsTargetAdressAsValue, count, source, target)); //first adress contains adress
-                            }
-                            else if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==true)
-                            {
-                                ret.AddRange(GetCopyInstruction(CopyMode.SecondAdressContainsTargetAdressAsValue, count, source, target)); 
-                            }
-                            else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==true)
-                            {
-                                ret.AddRange(GetCopyInstruction(CopyMode.BothAdressContainsTargetAdressAsValue, count, source, target)); 
-                            }
-
-                            break;
+							ret.AddRange(GetCopy(token[1], token[2], token[3]));
+							break;
                         }
                     case "DEC":
                         {
