@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Structura.Assembler.Jump;
 using Structura.Assembler.Add;
+using Structura.Assembler.Copy;
 
 namespace Structura.Assembler
 {
@@ -214,14 +215,6 @@ namespace Structura.Assembler
         #endregion
 
         #region COPY
-        enum CopyMode
-        {
-            NoAdressContainsTargetAdressAsValue=0,
-            FirstAdressContainsTargetAdressAsValue=1,
-            SecondAdressContainsTargetAdressAsValue=2,
-            BothAdressContainsTargetAdressAsValue=3
-        }
-
         static Int64[] GetCopyInstruction(CopyMode copyMode, Int64 count, Int64 source, Int64 target)
         {
             Int64[] instruction=new Int64[5];

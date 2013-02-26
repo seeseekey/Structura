@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Assembler\Add\AddMode.cs" />
     <Compile Include="Assembler\Assembler.cs" />
+    <Compile Include="Assembler\Copy\CopyMode.cs" />
     <Compile Include="Assembler\Disassembler.cs" />
     <Compile Include="Assembler\Jump\AdressInterpretation.cs" />
     <Compile Include="Assembler\Jump\JumpCondition.cs" />

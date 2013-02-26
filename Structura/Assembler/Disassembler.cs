@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Structura.Assembler.Jump;
 using Structura.Assembler.Add;
+using Structura.Assembler.Copy;
 
 namespace Structura.Assembler
 {
@@ -198,9 +199,9 @@ namespace Structura.Assembler
 				{
 					case 0: //JUMP
 						{
-							AdressInterpretation adressInterpretation=(AdressInterpretation)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
-
 							string jump="JUMP ";
+
+							AdressInterpretation adressInterpretation=(AdressInterpretation)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
 							jump+=GetJumpMode(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
 							jump+=GetJumpAdressing(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
 
@@ -218,11 +219,7 @@ namespace Structura.Assembler
 									}
 							}
 
-							jump+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
-							jump+=GetJumpMode(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
-
 							ret.Add(jump);
-
 							break;
 						}
 					case 1: //ADD
@@ -262,11 +259,54 @@ namespace Structura.Assembler
 							}
 
 							ret.Add(add);
-
 							break;
 						}
 					case 2: //COPY
 						{
+							string copy="COPY ";
+
+							CopyMode copyMode=(CopyMode)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+
+							copy+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+" "; //CopyLength
+
+							//FirstValue
+							Int64 registerOrMemoryAdress=GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+							string registerOrMemoryAdressAsString;
+							if(registerOrMemoryAdress<0)
+							{
+								registerOrMemoryAdressAsString=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
+							}
+							else
+							{
+								registerOrMemoryAdressAsString=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+" ";
+							}
+
+							if(copyMode==CopyMode.FirstAdressContainsTargetAdressAsValue||copyMode==CopyMode.BothAdressContainsTargetAdressAsValue)
+							{
+								registerOrMemoryAdressAsString="*"+registerOrMemoryAdressAsString;
+							}
+
+							copy+=registerOrMemoryAdressAsString;
+
+							//Second
+							registerOrMemoryAdress=GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+							if(registerOrMemoryAdress<0)
+							{
+								registerOrMemoryAdressAsString=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
+							}
+							else
+							{
+								registerOrMemoryAdressAsString=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
+							}
+
+							if(copyMode==CopyMode.SecondAdressContainsTargetAdressAsValue||copyMode==CopyMode.BothAdressContainsTargetAdressAsValue)
+							{
+								registerOrMemoryAdressAsString="*"+registerOrMemoryAdressAsString;
+							}
+
+							copy+=registerOrMemoryAdressAsString;
+
+							ret.Add(copy);
 							break;
 						}
 				}
