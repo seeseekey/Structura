@@ -8,6 +8,8 @@ namespace Structura.Assembler.Jump
 	public enum AdressInterpretation
 	{
 		AdressNotContainsTargetAdressAsValue=0,
-		AdressContainsTargetAdressAsValue=1
+		AdressContainsTargetAdressAsValue=1,
+		RegisterNotContainsTargetAdressAsValue=2,
+		RegisterContainsTargetAdressAsValue=3
 	}
 }

@@ -214,7 +214,17 @@ namespace Structura.Assembler
 									}
 								case AdressInterpretation.AdressContainsTargetAdressAsValue:
 									{
-										jump+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
+										jump+="*"+GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
+										break;
+									}
+								case AdressInterpretation.RegisterNotContainsTargetAdressAsValue:
+									{
+										jump+=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
+										break;
+									}
+								case AdressInterpretation.RegisterContainsTargetAdressAsValue:
+									{
+										jump+="*"+GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
 										break;
 									}
 							}
@@ -227,21 +237,6 @@ namespace Structura.Assembler
 							string add="ADD ";
 							
 							AddMode addMode=(AddMode)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
-							
-							switch(addMode)
-							{
-								case AddMode.RegisterAndRegister:
-									{
-										add+="RAR ";
-										break;
-									}
-									case AddMode.RegisterAndValue:
-									{
-										add+="RAV ";
-										break;
-									}
-							}
-
 							add+=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC)) + " ";
 
 							switch(addMode)

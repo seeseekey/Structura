@@ -264,16 +264,29 @@ namespace Structura.Assembler
                 {
                     case "JUMP":
                         {
-                            bool adressContainsTargetAdressAsValue=token[3].StartsWith("*");
-                            AdressInterpretation adressInterpretation=adressContainsTargetAdressAsValue?AdressInterpretation.AdressContainsTargetAdressAsValue:AdressInterpretation.AdressNotContainsTargetAdressAsValue;
+                            bool valueContainsTargetAdressAsValue=token[3].StartsWith("*");
+							token[3]=token[3].TrimStart('*');
 
-                            token[3]=token[3].TrimStart('*');
+							bool valueIsRegister=IsRegister(token[3]);
+
+							AdressInterpretation adressInterpretation;
+
+							if(valueContainsTargetAdressAsValue)
+							{
+								if(valueIsRegister) adressInterpretation=AdressInterpretation.RegisterContainsTargetAdressAsValue;
+								else adressInterpretation=AdressInterpretation.AdressContainsTargetAdressAsValue;
+							}
+							else
+							{
+								if(valueIsRegister) adressInterpretation=AdressInterpretation.RegisterNotContainsTargetAdressAsValue;
+								else adressInterpretation=AdressInterpretation.AdressNotContainsTargetAdressAsValue;
+							}
 
                             JumpCondition jumpCondition=GetJumpCondition(token[1]);
                             JumpMode jumpMode=GetJumpMode(token[2]);
                             Int64 target;
 
-                            if(IsRegister(token[3]))
+							if(valueIsRegister)
                             {
                                 target=GetRegisterNumber(token[3]);
                             }
