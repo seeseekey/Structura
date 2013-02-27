@@ -448,15 +448,24 @@ namespace Structura.Assembler
 								ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("X"), Convert.ToInt64(token[2]))); //Wert setzen
 							}
 
+							//DEC X um 1
+							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("X"), -1));
+
 							//NOOP Debug
-							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
-							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
-							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
+							//ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
+							//ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
+							//ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
 
 							//Wert aufmultiplizieren
 							ret.AddRange(GetMultiplication("W", "2"));
 							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("X"), -1)); //DEC X 1
 							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -400)); //Bedingter Sprung wenn X>0;
+
+							//In W ist nun der 2^(x) Wert enthalten / Nun Multiplikation mit dem ersten Wert
+							ret.AddRange(GetMultiplication(token[1], "W"));
+
+							//W bereinigen
+							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("W")));
 
 							break;
 						}
