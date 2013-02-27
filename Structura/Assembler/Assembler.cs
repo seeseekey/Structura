@@ -422,14 +422,41 @@ namespace Structura.Assembler
 					case "SHIFTL":
 						{
 							//Vorbereitung für SHIFTL
-							//ret.AddRange(GetCopy("8", "ZERO", "W")); //setze w auf 0
-							//ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), 2)); //setze w auf 2
-							ret.AddRange(GetCopy("8", token[2], "X")); //kopiere zweiten wert als zähler auf X
+							Int64 target=0;
+							AddMode addMode;
 
-							//ret.AddRange(GetMultiplication("W", "2"));
+							if(IsRegister(token[2])) //Register and register
+							{
+								target=Convert.ToInt64(GetRegisterNumber(token[2]));
+								addMode=AddMode.RegisterAndRegister;
+							}
+							else //Register and value
+							{
+								target=Convert.ToInt64(token[2]);
+								addMode=AddMode.RegisterAndValue;
+							}
 
-							//ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -1)); //DEC X 1
-							//ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -104)); //Bedingter Sprung wenn X>0;
+							//Register W X Y Z vorbereiten
+							ret.AddRange(GetCopy("8", "ZERO", "W")); //setze w auf 0
+							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), 2)); //setze w auf 2
+
+							if(addMode==AddMode.RegisterAndRegister) ret.AddRange(GetCopy("8", token[2], "X"));
+							else
+							{
+								//RegisterAndValue
+								ret.AddRange(GetCopy("8", "ZERO", "X")); //setze w auf 0
+								ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("X"), Convert.ToInt64(token[2]))); //Wert setzen
+							}
+
+							//NOOP Debug
+							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
+							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
+							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
+
+							//Wert aufmultiplizieren
+							ret.AddRange(GetMultiplication("W", "2"));
+							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("X"), -1)); //DEC X 1
+							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -400)); //Bedingter Sprung wenn X>0;
 
 							break;
 						}

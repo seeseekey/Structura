@@ -184,13 +184,15 @@ namespace Structura.Assembler
 			}
 		}
 
-		public static List<string> Disassemble(byte[] machineCodeAsByteArray)
+		public static List<string> Disassemble(byte[] machineCodeAsByteArray, bool withIC)
 		{
 			List<string> ret=new List<string>();
 			Int64 IC=0;
 
 			while(IC<machineCodeAsByteArray.Length)
 			{
+				Int64 preIC=IC;
+
 				//Get instruction word
 				Int64 instructionWord=GetNextInstructionWord(machineCodeAsByteArray, ref IC);
 
@@ -229,7 +231,13 @@ namespace Structura.Assembler
 									}
 							}
 
-							ret.Add(jump);
+							if(withIC)
+							{
+								int padLength=16-(preIC.ToString().Length+IC.ToString().Length);
+								string padding="".PadRight(padLength, ' ');
+								ret.Add(String.Format("({0}/{1}) {2} {3}", preIC, IC, padding, jump));
+							}
+							else ret.Add(jump);
 							break;
 						}
 					case 1: //ADD
@@ -253,7 +261,13 @@ namespace Structura.Assembler
 									}
 							}
 
-							ret.Add(add);
+							if(withIC)
+							{
+								int padLength=16-(preIC.ToString().Length+IC.ToString().Length);
+								string padding="".PadRight(padLength, ' ');
+								ret.Add(String.Format("({0}/{1}) {2} {3}", preIC, IC, padding, add));
+							}
+							else ret.Add(add);
 							break;
 						}
 					case 2: //COPY
@@ -301,7 +315,13 @@ namespace Structura.Assembler
 
 							copy+=registerOrMemoryAdressAsString;
 
-							ret.Add(copy);
+							if(withIC)
+							{
+								int padLength=16-(preIC.ToString().Length+IC.ToString().Length);
+								string padding="".PadRight(padLength, ' ');
+								ret.Add(String.Format("({0}/{1}) {2} {3}", preIC, IC, padding, copy));
+							}
+							else ret.Add(copy);
 							break;
 						}
 				}

@@ -53,7 +53,7 @@ namespace Structura
 			Console.WriteLine("Parameter:");
 			Console.WriteLine("  -file:<filename>");
 			Console.WriteLine("  -cycleInterval:<timeInMilliSeconds");
-			Console.WriteLine("  -disassemble");
+			Console.WriteLine("  -disassemble <-withIC>");
 		}
 
 		static void Main(string[] args)
@@ -95,7 +95,8 @@ namespace Structura
 			//Prüfe auf Disassembler
 			if(arguments.Contains("disassemble"))
 			{
-				List<string> disassembly=Disassembler.Disassemble(machineCodeAsByteArray);
+				bool withIC=arguments.GetBool("withIC", false);
+				List<string> disassembly=Disassembler.Disassemble(machineCodeAsByteArray, withIC);
 
 				foreach(string line in disassembly)
 				{
