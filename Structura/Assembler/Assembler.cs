@@ -317,6 +317,31 @@ namespace Structura.Assembler
 
 			return ret;
 		}
+
+		static List<Int64> GetAdd(string val1, string val2)
+		{
+			List<Int64> ret=new List<Int64>();
+
+			Int64 target=0;
+			AddMode addMode;
+
+			if(IsRegister(val2.TrimStart('-'))) //Register and register
+			{
+				target=Convert.ToInt64(GetRegisterNumber(val2.TrimStart('-')));
+
+				if(val2.StartsWith("-")) addMode=AddMode.RegisterAndNegativeRegister;
+				else addMode=AddMode.RegisterAndRegister;
+			}
+			else //Register and value
+			{
+				target=Convert.ToInt64(val2);
+				addMode=AddMode.RegisterAndValue;
+			}
+
+			ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber(val1), target));
+
+			return ret;
+		}
 		#endregion
 
 		public static Int64[] Assemble(string[] assembler)
@@ -396,39 +421,15 @@ namespace Structura.Assembler
                         }
 					case "NEG":
 						{
-							//Überprüfen ob 
-							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 0)); //Vorzeichen ermitteln
-							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 104)); //Nicht machen und Anweisungsblock überspringen
-							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, 80)); //Zahl ist positiv -> zu entsprechendem block spriungen
+							ret.AddRange(GetCopy("8", token[1], "Z")); //Kopiere Register auf Z
 
-							//Negative Block
-							ret.AddRange(GetCopy("8", token[1], "Z")); //setze w auf 0
-							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 0)); //Vorzeichen ermitteln
-							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 0)); //Vorzeichen ermitteln
-
-							//Positivblock
-
+							ret.AddRange(GetAdd(token[1], "-Z"));
+							ret.AddRange(GetAdd(token[1], "-Z"));
 							break;
 						}
                     case "ADD":
                         {
-                            Int64 target=0;
-                            AddMode addMode;
-
-                            if(IsRegister(token[2].TrimStart('-'))) //Register and register
-                            {
-								target=Convert.ToInt64(GetRegisterNumber(token[2].TrimStart('-')));
-
-								if(token[2].StartsWith("-")) addMode=AddMode.RegisterAndNegativeRegister;
-                                else addMode=AddMode.RegisterAndRegister;
-                            }
-                            else //Register and value
-                            {
-                                target=Convert.ToInt64(token[2]);
-                                addMode=AddMode.RegisterAndValue;
-                            }
-
-                            ret.AddRange(GetAddInstruction(addMode, GetRegisterNumber(token[1]), target));
+							ret.AddRange(GetAdd(token[1], token[2]));
                             break;
                         }
                     case "MUL":
