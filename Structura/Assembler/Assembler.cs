@@ -304,7 +304,9 @@ namespace Structura.Assembler
 				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
 			}
 
-			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
+			ret.AddRange(GetAbs("Z", "W")); //Zähler absoulut machen
+
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), -1)); //DEC Z 1
 
 			//Multiplikationsschleife
 			ret.AddRange(GetAddInstruction(AddMode.RegisterAndRegister, GetRegisterNumber(val1), GetRegisterNumber("Y"))); //Source + Source
@@ -314,6 +316,23 @@ namespace Structura.Assembler
 			//Bereinige Register Y und Z
 			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Y")));
 			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+
+			return ret;
+		}
+
+		static List<Int64> GetAbs(string val1, string workRegister)
+		{
+			List<Int64> ret=new List<Int64>();
+
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(val1), 0));
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, 184)); //Überspringe Abs Block
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 144)); //Überspringe Abs Block
+
+			//Abs Block
+			ret.AddRange(GetCopy("8", val1, workRegister)); //Kopiere Register auf Z
+			ret.AddRange(GetAdd(val1, "-"+workRegister));
+			ret.AddRange(GetAdd(val1, "-"+workRegister));
+			ret.AddRange(GetCopy("8", "ZERO", workRegister)); //setze zw auf 0
 
 			return ret;
 		}
@@ -421,16 +440,7 @@ namespace Structura.Assembler
                         }
 					case "ABS":
 						{
-							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 0));
-							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, 184)); //Überspringe Block
-							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 144)); //Überspringe Block
-
-							//Abs Block
-							ret.AddRange(GetCopy("8", token[1], "Z")); //Kopiere Register auf Z
-							ret.AddRange(GetAdd(token[1], "-Z"));
-							ret.AddRange(GetAdd(token[1], "-Z"));
-							ret.AddRange(GetCopy("8", "ZERO", "Z")); //setze zw auf 0
-							
+							ret.AddRange(GetAbs(token[1], "Z"));
 							break;
 						}
 					case "NEG":
