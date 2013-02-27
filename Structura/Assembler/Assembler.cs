@@ -394,15 +394,33 @@ namespace Structura.Assembler
                             ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 0));
                             break;
                         }
+					case "NEG":
+						{
+							//Überprüfen ob 
+							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 0)); //Vorzeichen ermitteln
+							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 104)); //Nicht machen und Anweisungsblock überspringen
+							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, 80)); //Zahl ist positiv -> zu entsprechendem block spriungen
+
+							//Negative Block
+							ret.AddRange(GetCopy("8", token[1], "Z")); //setze w auf 0
+							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 0)); //Vorzeichen ermitteln
+							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 0)); //Vorzeichen ermitteln
+
+							//Positivblock
+
+							break;
+						}
                     case "ADD":
                         {
                             Int64 target=0;
                             AddMode addMode;
 
-                            if(IsRegister(token[2])) //Register and register
+                            if(IsRegister(token[2].TrimStart('-'))) //Register and register
                             {
-                                target=Convert.ToInt64(GetRegisterNumber(token[2]));
-                                addMode=AddMode.RegisterAndRegister;
+								target=Convert.ToInt64(GetRegisterNumber(token[2].TrimStart('-')));
+
+								if(token[2].StartsWith("-")) addMode=AddMode.RegisterAndNegativeRegister;
+                                else addMode=AddMode.RegisterAndRegister;
                             }
                             else //Register and value
                             {

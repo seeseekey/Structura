@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Timers;
+using Structura.Assembler.Add;
 
 namespace Structura.Hardware
 {
@@ -406,13 +407,14 @@ namespace Structura.Hardware
 					{
 						Overflow=false;
 
-						Int64 addMode=GetNextInstructionWord();
+						AddMode addMode=(AddMode)(int)GetNextInstructionWord();
 						Int64 registerA=GetNextInstructionWord();
 						Int64 val=0;
 
-						if(addMode==0) //RAR
+						if(addMode==AddMode.RegisterAndRegister||addMode==AddMode.RegisterAndNegativeRegister) //RAR oder RANR;
 						{
 							Int64 registerBValue=GetRegisterValue(GetNextInstructionWord());
+							if(addMode==AddMode.RegisterAndNegativeRegister) registerBValue=(-registerBValue);
 
 							checked
 							{

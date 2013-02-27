@@ -8,6 +8,7 @@ namespace Structura.Assembler.Add
 	public enum AddMode
 	{
 		RegisterAndRegister=0,
-		RegisterAndValue=1
+		RegisterAndNegativeRegister=1,
+		RegisterAndValue=2
 	}
 }
