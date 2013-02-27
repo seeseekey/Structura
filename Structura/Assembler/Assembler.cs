@@ -419,12 +419,26 @@ namespace Structura.Assembler
                             ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 0));
                             break;
                         }
+					case "ABS":
+						{
+							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), 0));
+							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, 184)); //Überspringe Block
+							ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 144)); //Überspringe Block
+
+							//Abs Block
+							ret.AddRange(GetCopy("8", token[1], "Z")); //Kopiere Register auf Z
+							ret.AddRange(GetAdd(token[1], "-Z"));
+							ret.AddRange(GetAdd(token[1], "-Z"));
+							ret.AddRange(GetCopy("8", "ZERO", "Z")); //setze zw auf 0
+							
+							break;
+						}
 					case "NEG":
 						{
 							ret.AddRange(GetCopy("8", token[1], "Z")); //Kopiere Register auf Z
-
 							ret.AddRange(GetAdd(token[1], "-Z"));
 							ret.AddRange(GetAdd(token[1], "-Z"));
+							ret.AddRange(GetCopy("8", "ZERO", "Z")); //setze z auf 0
 							break;
 						}
                     case "ADD":
