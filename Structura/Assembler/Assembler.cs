@@ -451,11 +451,6 @@ namespace Structura.Assembler
 							//DEC X um 1
 							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("X"), -1));
 
-							//NOOP Debug
-							//ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
-							//ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
-							//ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
-
 							//Wert aufmultiplizieren
 							ret.AddRange(GetMultiplication("W", "2"));
 							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("X"), -1)); //DEC X 1
