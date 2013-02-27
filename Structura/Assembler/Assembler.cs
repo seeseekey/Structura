@@ -346,8 +346,7 @@ namespace Structura.Assembler
             foreach(string line in lines)
             {
                 string[] token=line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if(token.Length==0)
-                    continue;
+                if(token.Length==0) continue;
 
                 string instructionWord=token[0].ToUpper();
 
@@ -392,7 +391,7 @@ namespace Structura.Assembler
                         }
                     case "NOOP":
                         {
-                            ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 1));
+                            ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, 0));
                             break;
                         }
                     case "ADD":
