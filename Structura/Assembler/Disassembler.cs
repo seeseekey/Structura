@@ -269,6 +269,11 @@ namespace Structura.Assembler
                                         add+=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
                                         break;
                                     }
+                                case AddMode.RegisterAndNegativeRegister:
+                                    {
+                                        add+="-"+GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
+                                        break;
+                                    }
                                 case AddMode.RegisterAndValue:
                                     {
                                         add+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
