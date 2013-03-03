@@ -63,7 +63,6 @@ namespace Structura.Hardware
             }
         }
 
-        //TODO Check ob 
         public void WriteData(Int64 offset, byte[] bytes)
         {
             IMemoryOverlay device;
@@ -81,6 +80,12 @@ namespace Structura.Hardware
             }
             else
             {
+                //Check ob Speicher groß genug
+                if(data.Length-offset<bytes.Length)
+                {
+                    throw new OutOfMemoryException();
+                }
+
                 Array.Copy(bytes, 0, data, (int)offset, bytes.Length);
             }
         }
