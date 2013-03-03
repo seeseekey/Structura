@@ -158,7 +158,18 @@ namespace Structura
             {
                 PrintInternalStates(cpu);
 				
-                Int64[] processedInstruction=cpu.Execute();
+                Int64[] processedInstruction;
+
+                try
+                {
+                    processedInstruction=cpu.Execute();
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    running=false;
+                    break; //aus runnig ausbrechen
+                }
 
                 if(traceExecution)
                 {

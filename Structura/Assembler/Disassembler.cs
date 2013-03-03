@@ -211,141 +211,149 @@ namespace Structura.Assembler
                 Int64 instructionWord=GetNextInstructionWord(machineCodeAsByteArray, ref IC);
 
                 //Auswerten
-                switch(instructionWord)
+                try
                 {
-                    case 0: //JUMP
-                        {
-                            string jump="JUMP ";
-
-                            AdressInterpretation adressInterpretation=(AdressInterpretation)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
-                            jump+=GetJumpMode(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
-                            jump+=GetJumpAdressing(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
-
-                            switch(adressInterpretation)
+                    switch(instructionWord)
+                    {
+                        case 0: //JUMP
                             {
-                                case AdressInterpretation.AdressNotContainsTargetAdressAsValue:
-                                    {
-                                        jump+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
-                                        break;
-                                    }
-                                case AdressInterpretation.AdressContainsTargetAdressAsValue:
-                                    {
-                                        jump+="*"+GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
-                                        break;
-                                    }
-                                case AdressInterpretation.RegisterNotContainsTargetAdressAsValue:
-                                    {
-                                        jump+=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
-                                        break;
-                                    }
-                                case AdressInterpretation.RegisterContainsTargetAdressAsValue:
-                                    {
-                                        jump+="*"+GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
-                                        break;
-                                    }
-                            }
+                                string jump="JUMP ";
 
-                            if(withIC)
-                            {
-                                int padLength=16-(preIC.ToString().Length+IC.ToString().Length);
-                                string padding="".PadRight(padLength, ' ');
-                                ret.Add(String.Format("({0}/{1}) {2} {3}", preIC, IC, padding, jump));
+                                AdressInterpretation adressInterpretation=(AdressInterpretation)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+                                jump+=GetJumpMode(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
+                                jump+=GetJumpAdressing(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
+
+                                switch(adressInterpretation)
+                                {
+                                    case AdressInterpretation.AdressNotContainsTargetAdressAsValue:
+                                        {
+                                            jump+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
+                                            break;
+                                        }
+                                    case AdressInterpretation.AdressContainsTargetAdressAsValue:
+                                        {
+                                            jump+="*"+GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
+                                            break;
+                                        }
+                                    case AdressInterpretation.RegisterNotContainsTargetAdressAsValue:
+                                        {
+                                            jump+=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
+                                            break;
+                                        }
+                                    case AdressInterpretation.RegisterContainsTargetAdressAsValue:
+                                        {
+                                            jump+="*"+GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
+                                            break;
+                                        }
+                                }
+
+                                if(withIC)
+                                {
+                                    int padLength=16-(preIC.ToString().Length+IC.ToString().Length);
+                                    string padding="".PadRight(padLength, ' ');
+                                    ret.Add(String.Format("({0}/{1}) {2} {3}", preIC, IC, padding, jump));
+                                }
+                                else
+                                    ret.Add(jump);
+                                break;
                             }
-                            else
-                                ret.Add(jump);
-                            break;
-                        }
-                    case 1: //ADD
-                        {
-                            string add="ADD ";
+                        case 1: //ADD
+                            {
+                                string add="ADD ";
 							
-                            AddMode addMode=(AddMode)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
-                            add+=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
+                                AddMode addMode=(AddMode)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+                                add+=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+" ";
 
-                            switch(addMode)
-                            {
-                                case AddMode.RegisterAndRegister:
-                                    {
-                                        add+=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
-                                        break;
-                                    }
-                                case AddMode.RegisterAndNegativeRegister:
-                                    {
-                                        add+="-"+GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
-                                        break;
-                                    }
-                                case AddMode.RegisterAndValue:
-                                    {
-                                        add+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
-                                        break;
-                                    }
+                                switch(addMode)
+                                {
+                                    case AddMode.RegisterAndRegister:
+                                        {
+                                            add+=GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
+                                            break;
+                                        }
+                                    case AddMode.RegisterAndNegativeRegister:
+                                        {
+                                            add+="-"+GetRegisterName(GetNextInstructionWord(machineCodeAsByteArray, ref IC))+";";
+                                            break;
+                                        }
+                                    case AddMode.RegisterAndValue:
+                                        {
+                                            add+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+";";
+                                            break;
+                                        }
+                                }
+
+                                if(withIC)
+                                {
+                                    int padLength=16-(preIC.ToString().Length+IC.ToString().Length);
+                                    string padding="".PadRight(padLength, ' ');
+                                    ret.Add(String.Format("({0}/{1}) {2} {3}", preIC, IC, padding, add));
+                                }
+                                else
+                                    ret.Add(add);
+                                break;
                             }
-
-                            if(withIC)
+                        case 2: //COPY
                             {
-                                int padLength=16-(preIC.ToString().Length+IC.ToString().Length);
-                                string padding="".PadRight(padLength, ' ');
-                                ret.Add(String.Format("({0}/{1}) {2} {3}", preIC, IC, padding, add));
+                                string copy="COPY ";
+
+                                CopyMode copyMode=(CopyMode)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+
+                                copy+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+" "; //CopyLength
+
+                                //FirstValue
+                                Int64 registerOrMemoryAdress=GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+                                string registerOrMemoryAdressAsString;
+                                if(registerOrMemoryAdress<0)
+                                {
+                                    registerOrMemoryAdressAsString=GetRegisterName(registerOrMemoryAdress)+" ";
+                                }
+                                else
+                                {
+                                    registerOrMemoryAdressAsString=registerOrMemoryAdress+" ";
+                                }
+
+                                if(copyMode==CopyMode.FirstAdressContainsTargetAdressAsValue||copyMode==CopyMode.BothAdressContainsTargetAdressAsValue)
+                                {
+                                    registerOrMemoryAdressAsString="*"+registerOrMemoryAdressAsString;
+                                }
+
+                                copy+=registerOrMemoryAdressAsString;
+
+                                //Second
+                                registerOrMemoryAdress=GetNextInstructionWord(machineCodeAsByteArray, ref IC);
+                                if(registerOrMemoryAdress<0)
+                                {
+                                    registerOrMemoryAdressAsString=GetRegisterName(registerOrMemoryAdress)+";";
+                                }
+                                else
+                                {
+                                    registerOrMemoryAdressAsString=registerOrMemoryAdress+";";
+                                }
+
+                                if(copyMode==CopyMode.SecondAdressContainsTargetAdressAsValue||copyMode==CopyMode.BothAdressContainsTargetAdressAsValue)
+                                {
+                                    registerOrMemoryAdressAsString="*"+registerOrMemoryAdressAsString;
+                                }
+
+                                copy+=registerOrMemoryAdressAsString;
+
+                                if(withIC)
+                                {
+                                    int padLength=16-(preIC.ToString().Length+IC.ToString().Length);
+                                    string padding="".PadRight(padLength, ' ');
+                                    ret.Add(String.Format("({0}/{1}) {2} {3}", preIC, IC, padding, copy));
+                                }
+                                else
+                                    ret.Add(copy);
+                                break;
                             }
-                            else
-                                ret.Add(add);
-                            break;
-                        }
-                    case 2: //COPY
-                        {
-                            string copy="COPY ";
-
-                            CopyMode copyMode=(CopyMode)GetNextInstructionWord(machineCodeAsByteArray, ref IC);
-
-                            copy+=GetNextInstructionWord(machineCodeAsByteArray, ref IC)+" "; //CopyLength
-
-                            //FirstValue
-                            Int64 registerOrMemoryAdress=GetNextInstructionWord(machineCodeAsByteArray, ref IC);
-                            string registerOrMemoryAdressAsString;
-                            if(registerOrMemoryAdress<0)
-                            {
-                                registerOrMemoryAdressAsString=GetRegisterName(registerOrMemoryAdress)+" ";
-                            }
-                            else
-                            {
-                                registerOrMemoryAdressAsString=registerOrMemoryAdress+" ";
-                            }
-
-                            if(copyMode==CopyMode.FirstAdressContainsTargetAdressAsValue||copyMode==CopyMode.BothAdressContainsTargetAdressAsValue)
-                            {
-                                registerOrMemoryAdressAsString="*"+registerOrMemoryAdressAsString;
-                            }
-
-                            copy+=registerOrMemoryAdressAsString;
-
-                            //Second
-                            registerOrMemoryAdress=GetNextInstructionWord(machineCodeAsByteArray, ref IC);
-                            if(registerOrMemoryAdress<0)
-                            {
-                                registerOrMemoryAdressAsString=GetRegisterName(registerOrMemoryAdress)+";";
-                            }
-                            else
-                            {
-                                registerOrMemoryAdressAsString=registerOrMemoryAdress+";";
-                            }
-
-                            if(copyMode==CopyMode.SecondAdressContainsTargetAdressAsValue||copyMode==CopyMode.BothAdressContainsTargetAdressAsValue)
-                            {
-                                registerOrMemoryAdressAsString="*"+registerOrMemoryAdressAsString;
-                            }
-
-                            copy+=registerOrMemoryAdressAsString;
-
-                            if(withIC)
-                            {
-                                int padLength=16-(preIC.ToString().Length+IC.ToString().Length);
-                                string padding="".PadRight(padLength, ' ');
-                                ret.Add(String.Format("({0}/{1}) {2} {3}", preIC, IC, padding, copy));
-                            }
-                            else
-                                ret.Add(copy);
-                            break;
-                        }
+                    }
+                }
+                catch
+                {
+                    ret.Add("Disassembler can't continue disassembling due an illegal opcode.");
+                    break;
                 }
             }
 
