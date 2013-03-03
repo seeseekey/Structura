@@ -147,6 +147,7 @@ namespace Structura
         static void ExecuteSystem()
         {
             StreamWriter writer;
+            List<Int64> processedInstructions=new List<Int64>();
 
             if(traceExecution)
             {
@@ -157,15 +158,11 @@ namespace Structura
             {
                 PrintInternalStates(cpu);
 				
-                List<string> trace=cpu.Execute();
+                Int64[] processedInstruction=cpu.Execute();
 
                 if(traceExecution)
                 {
-                    foreach(string line in trace)
-                    {
-                        writer.WriteLine(line);
-                        writer.Flush();
-                    }
+                    processedInstructions.AddRange(processedInstruction);
                 }
 
                 graphic.Display();
@@ -175,7 +172,16 @@ namespace Structura
             }
 
             if(traceExecution)
+            {
+                List<string> lines=Disassembler.Disassemble(processedInstructions.ToArray(), true);
+
+                foreach(string line in lines)
+                {
+                    writer.WriteLine(line);
+                }
+
                 writer.Close();
+            }
         }
     }
 }

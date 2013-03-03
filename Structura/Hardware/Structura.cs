@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 using Structura.Assembler.Add;
-using Structura.Assembler;
 
 namespace Structura.Hardware
 {
@@ -60,7 +59,7 @@ namespace Structura.Hardware
         }
 
         //Methoden
-        public List<string> Execute()
+        public Int64[] Execute()
         {
             List<Int64> instructionLog=new List<Int64>();
 
@@ -68,7 +67,7 @@ namespace Structura.Hardware
             Int64 instructionWord=GetNextInstructionWord(instructionLog);
             ExecuteMachineCode(instructionWord, instructionLog);
 
-            return Disassembler.Disassemble(instructionLog.ToArray(), true);
+            return instructionLog.ToArray();
         }
 
         Int64 GetNextInstructionWord(List<Int64> instructionLog)
