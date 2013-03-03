@@ -53,7 +53,7 @@ namespace Structura
             Console.WriteLine("");
             Console.WriteLine("Parameter:");
             Console.WriteLine("  -file:<filename>");
-            Console.WriteLine("  -cycleInterval:<timeInMilliSeconds");
+            Console.WriteLine("  -cycleInterval:<timeInMilliSeconds>");
             Console.WriteLine("  -disassemble <-withIC>");
             Console.WriteLine("  -traceExecution");
         }
