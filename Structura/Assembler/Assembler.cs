@@ -345,17 +345,17 @@ namespace Structura.Assembler
             //Ist X==2?
             ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
             ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -2));
-            ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 256));
+            ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 368)); //springe zum register leeren
 
             //Ist X==1?
             ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
             ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -1));
-            ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 112));
+            ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 112)); //springe zum vorzeichen umdrehen
 
             //Ist X==0?
             ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
             ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), 0));
-            ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 184));
+            ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 144)); //springe zum register leeren
 
             //Vorzeichenanzahl ist 1, damit ist Vorzeichen negativ
             ret.AddRange(GetNeg(val1, "W"));
