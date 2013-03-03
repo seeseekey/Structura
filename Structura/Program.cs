@@ -173,7 +173,7 @@ namespace Structura
 
             if(traceExecution)
             {
-                List<string> lines=Disassembler.Disassemble(processedInstructions.ToArray(), true);
+                List<string> lines=Disassembler.Disassemble(processedInstructions.ToArray(), false); //IC Nummern stimmen beim trace nicht (kein reiner Disassemble)
 
                 foreach(string line in lines)
                 {
