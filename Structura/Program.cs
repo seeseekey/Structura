@@ -77,7 +77,7 @@ namespace Structura
 
             if(arguments.Contains("cycleInterval"))
             {
-                cycleInterval=Convert.ToInt32(arguments.GetInt32("cycleInterval"));
+                cycleInterval=Convert.ToInt32(arguments.GetString("cycleInterval"));
             }
 
             Console.CancelKeyPress+=new ConsoleCancelEventHandler(Console_CancelKeyPress);
