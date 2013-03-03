@@ -31,7 +31,7 @@ namespace Structura.Hardware
 
         public Memory()
         {
-            data=new byte[8192]; //8 Kilobyte
+            data=new byte[262144]; //256 Kilobyte
             MemoryOverlays=new List<IMemoryOverlay>();
         }
 
