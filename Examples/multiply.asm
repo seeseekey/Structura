@@ -1,4 +1,10 @@
-ADD A 1;  //Add Befehl
-ADD B 555;  //Add Befehl
-MUL A B;
-MUL A 7;
+ADD A 7;
+ADD B 8;
+ADD C -20;
+MUL A -3; //A==-21
+MUL B 3; //B==24
+MUL C -5; //C==15
+MUL A B; //A==168
+NOOP;
+NOOP;
+NOOP;
