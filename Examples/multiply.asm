@@ -4,7 +4,7 @@ ADD C -20;
 MUL A -3; //A==-21
 MUL B 3; //B==24
 MUL C -5; //C==100
-MUL A B; //A==504
+MUL A B; //A==-504
 NOOP;
 NOOP;
 NOOP;
