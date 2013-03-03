@@ -60,20 +60,23 @@ namespace Structura.Hardware
         }
 
         //Methoden
-        public string Execute()
+        public List<string> Execute()
         {
-            //... IC -> Speicher -> ausführen
-            Int64 instructionWord=GetNextInstructionWord();
-            ExecuteMachineCode(instructionWord);
+            List<Int64> instructionLog=new List<Int64>();
 
-            return "";
+            //... IC -> Speicher -> ausführen
+            Int64 instructionWord=GetNextInstructionWord(instructionLog);
+            ExecuteMachineCode(instructionWord, instructionLog);
+
+            return Disassembler.Disassemble(instructionLog.ToArray(), true);
         }
 
-        Int64 GetNextInstructionWord()
+        Int64 GetNextInstructionWord(List<Int64> instructionLog)
         {
             byte[] bytes=Memory.GetData((int)IC, 8);
             Int64 ret=BitConverter.ToInt64(bytes, 0);
             IC+=8;
+            instructionLog.Add(ret);
             return ret;
         }
 
@@ -337,18 +340,18 @@ namespace Structura.Hardware
             }
         }
 
-        void ExecuteMachineCode(Int64 instructionWord)
+        void ExecuteMachineCode(Int64 instructionWord, List<Int64> instructionLog)
         {
             switch(instructionWord)
             {
                 case 0: //JUMP
                     {
-                        Int64 adressMode=GetNextInstructionWord();
-                        Int64 jumpCondition=GetNextInstructionWord();
-                        Int64 jumpMode=GetNextInstructionWord();
+                        Int64 adressMode=GetNextInstructionWord(instructionLog);
+                        Int64 jumpCondition=GetNextInstructionWord(instructionLog);
+                        Int64 jumpMode=GetNextInstructionWord(instructionLog);
 
                         //Calc target
-                        Int64 target=GetNextInstructionWord();
+                        Int64 target=GetNextInstructionWord(instructionLog);
                         if(adressMode==1) //Adress contains target adress as value
                         {
                             target=GetRegisterValue(target);
@@ -412,13 +415,13 @@ namespace Structura.Hardware
                     {
                         Overflow=false;
 
-                        AddMode addMode=(AddMode)(int)GetNextInstructionWord();
-                        Int64 registerA=GetNextInstructionWord();
+                        AddMode addMode=(AddMode)(int)GetNextInstructionWord(instructionLog);
+                        Int64 registerA=GetNextInstructionWord(instructionLog);
                         Int64 val=0;
 
                         if(addMode==AddMode.RegisterAndRegister||addMode==AddMode.RegisterAndNegativeRegister) //RAR oder RANR;
                         {
-                            Int64 registerBValue=GetRegisterValue(GetNextInstructionWord());
+                            Int64 registerBValue=GetRegisterValue(GetNextInstructionWord(instructionLog));
                             if(addMode==AddMode.RegisterAndNegativeRegister)
                                 registerBValue=(-registerBValue);
 
@@ -439,7 +442,7 @@ namespace Structura.Hardware
                         }
                         else //RAV
                         {
-                            Int64 value=GetNextInstructionWord();
+                            Int64 value=GetNextInstructionWord(instructionLog);
 
                             checked
                             {
@@ -465,10 +468,10 @@ namespace Structura.Hardware
                     }
                 case 2: //COPY
                     {
-                        Int64 copyMode=GetNextInstructionWord();
-                        Int64 count=GetNextInstructionWord();
-                        Int64 sourceAdress=GetNextInstructionWord();
-                        Int64 targetAdress=GetNextInstructionWord();
+                        Int64 copyMode=GetNextInstructionWord(instructionLog);
+                        Int64 count=GetNextInstructionWord(instructionLog);
+                        Int64 sourceAdress=GetNextInstructionWord(instructionLog);
+                        Int64 targetAdress=GetNextInstructionWord(instructionLog);
 
                         byte[] sourceValue;//=new byte[count];
 
@@ -506,7 +509,7 @@ namespace Structura.Hardware
                         }
                         else
                         {
-                            Int64 targetMemoryAdress=GetNextInstructionWord();
+                            Int64 targetMemoryAdress=GetNextInstructionWord(instructionLog);
                             Memory.WriteData(targetMemoryAdress, sourceValue);
                         }
 

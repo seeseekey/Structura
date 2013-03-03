@@ -157,12 +157,15 @@ namespace Structura
             {
                 PrintInternalStates(cpu);
 				
-                string trace=cpu.Execute();
+                List<string> trace=cpu.Execute();
 
                 if(traceExecution)
                 {
-                    writer.WriteLine(trace);
-                    writer.Flush();
+                    foreach(string line in trace)
+                    {
+                        writer.WriteLine(line);
+                        writer.Flush();
+                    }
                 }
 
                 graphic.Display();
