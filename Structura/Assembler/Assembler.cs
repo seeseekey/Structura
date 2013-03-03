@@ -567,6 +567,43 @@ namespace Structura.Assembler
                             ret.AddRange(GetCopy(token[1], token[2], token[3]));
                             break;
                         }
+                    case "CLR":
+                        {
+                            if(token[1]=="ALL")
+                            {
+                                ret.AddRange(GetCopy("8", "ZERO", "A"));
+                                ret.AddRange(GetCopy("8", "ZERO", "B"));
+                                ret.AddRange(GetCopy("8", "ZERO", "C"));
+                                ret.AddRange(GetCopy("8", "ZERO", "D"));
+                                ret.AddRange(GetCopy("8", "ZERO", "E"));
+                                ret.AddRange(GetCopy("8", "ZERO", "F"));
+                                ret.AddRange(GetCopy("8", "ZERO", "G"));
+                                ret.AddRange(GetCopy("8", "ZERO", "H"));
+                                ret.AddRange(GetCopy("8", "ZERO", "I"));
+                                ret.AddRange(GetCopy("8", "ZERO", "J"));
+                                ret.AddRange(GetCopy("8", "ZERO", "K"));
+                                ret.AddRange(GetCopy("8", "ZERO", "L"));
+                                ret.AddRange(GetCopy("8", "ZERO", "M"));
+                                ret.AddRange(GetCopy("8", "ZERO", "N"));
+                                ret.AddRange(GetCopy("8", "ZERO", "O"));
+                                ret.AddRange(GetCopy("8", "ZERO", "P"));
+                                ret.AddRange(GetCopy("8", "ZERO", "Q"));
+                                ret.AddRange(GetCopy("8", "ZERO", "R"));
+                                ret.AddRange(GetCopy("8", "ZERO", "S"));
+                                ret.AddRange(GetCopy("8", "ZERO", "T"));
+                                ret.AddRange(GetCopy("8", "ZERO", "U"));
+                                ret.AddRange(GetCopy("8", "ZERO", "V"));
+                                ret.AddRange(GetCopy("8", "ZERO", "W"));
+                                ret.AddRange(GetCopy("8", "ZERO", "X"));
+                                ret.AddRange(GetCopy("8", "ZERO", "Y"));
+                                ret.AddRange(GetCopy("8", "ZERO", "Z"));
+                            }
+                            else
+                            {
+                                ret.AddRange(GetCopy("8", "ZERO", token[1]));
+                            }
+                            break;
+                        }
                     case "DEC":
                         {
                             ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(token[1]), -1)); //RAV Register Value
