@@ -146,7 +146,7 @@ namespace Structura
 
         static void ExecuteSystem()
         {
-            StreamWriter writer;
+			StreamWriter writer=null;
             List<Int64> processedInstructions=new List<Int64>();
 
             if(traceExecution)
@@ -184,14 +184,17 @@ namespace Structura
 
             if(traceExecution)
             {
-                List<string> lines=Disassembler.Disassemble(processedInstructions.ToArray(), false); //IC Nummern stimmen beim trace nicht (kein reiner Disassemble)
+				if(writer!=null)
+				{
+					List<string> lines=Disassembler.Disassemble(processedInstructions.ToArray(), false); //IC Nummern stimmen beim trace nicht (kein reiner Disassemble)
 
-                foreach(string line in lines)
-                {
-                    writer.WriteLine(line);
-                }
+					foreach(string line in lines)
+					{
+						writer.WriteLine(line);
+					}
 
-                writer.Close();
+					writer.Close();
+				}
             }
         }
     }
