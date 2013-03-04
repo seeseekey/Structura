@@ -71,7 +71,7 @@ COPY [Int64|Menge an kopierenden Daten in Byte] [Register oder Speicheradresse] 
 DIV [Register] [Register oder Wert]
   > Type: complex command
   > Effect: Divide the first value through the second value
-  > Flags: none
+  > Flags: Zero (if division by 0)
   > Register used: W, X, Y, Z
   > Example: DIV A 3;
 
@@ -102,6 +102,13 @@ JUMP [Jump condition|NONE|ZERO|POS|NEG|OVL] [Jump adressing|ABS|REL] [Adress or 
   > Flags: none
   > Register used: none
   > Example: JUMP POS REL -100;
+  
+MOD [Register] [Register oder Wert]
+  > Type: complex command
+  > Effect: Write the remainder the of the division in the first value
+  > Flags: Zero (if division by 0)
+  > Register used: W, X, Y, Z
+  > Example: MOD A 3;
 
 MUL [Register] [Register or value]
   > Type: complex command
