@@ -461,6 +461,99 @@ namespace Structura.Assembler
 			return ret;
 		}
 
+		static List<Int64> GetModulo(string val1, string val2)
+		{
+			List<Int64> ret=new List<Int64>();
+
+			Int64 target=0;
+			AddMode addMode;
+
+			if(IsRegister(val2)) //Register and register
+			{
+				target=Convert.ToInt64(GetRegisterNumber(val2));
+				addMode=AddMode.RegisterAndRegister;
+			}
+			else //Register and value
+			{
+				target=Convert.ToInt64(val2);
+				addMode=AddMode.RegisterAndValue;
+			}
+
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("Y"))); //kopiere Register auf Y
+
+			//AddMode auswerten
+			if(addMode==AddMode.RegisterAndValue)
+			{
+				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+				ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), target));
+			}
+			else //Register and Register
+			{
+				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
+			}
+
+			//Feststellen ob Division durch 0 vorliegt
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), 0));
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 1624)); //Überspringe restlichen DIV Block
+
+			//Vorzeichen zählen
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("X")));
+
+			//Y
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Y"), 0));
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, 72)); //Überspringe Abs Block
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 32)); //Überspringe Abs Block
+			ret.AddRange(GetAdd("X", "1"));
+
+			//Z
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), 0));
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, 72)); //Überspringe Abs Block
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 32)); //Überspringe Abs Block
+			ret.AddRange(GetAdd("X", "1"));
+
+			//Zähler absolut machen
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber(val1)));
+			ret.AddRange(GetAbs("Y", "W"));
+			ret.AddRange(GetAbs("Z", "W"));
+
+			//Zielregister leeren um Ergebnis zu speichern
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber(val1)));
+
+			//Divisionsschleife
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndNegativeRegister, GetRegisterNumber("Y"), GetRegisterNumber("Z"))); //Source + Source
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 152)); //Bedingter Sprung wenn Z>0;
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Negative, JumpMode.Relative, 112)); //Bedingter Sprung wenn Z>0;
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(val1), 1)); //wenn wert nicht negativ oder null, zähle hoch
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, -184)); //Sprung zurück
+
+			//Vorzeichen wieder antragen
+
+			//Ist X==2?
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -2));
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 368)); //springe zum register leeren
+
+			//Ist X==1?
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -1));
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 112)); //springe zum vorzeichen umdrehen
+
+			//Ist X==0?
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), 0));
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 144)); //springe zum register leeren
+
+			//Vorzeichenanzahl ist 1, damit ist Vorzeichen negativ
+			ret.AddRange(GetNeg(val1, "W"));
+
+			//Bereinige Register X, Y und Z
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("X")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Y")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+
+			return ret;
+		}
+
         static List<Int64> GetAbs(string val1, string workRegister)
         {
             List<Int64> ret=new List<Int64>();
@@ -612,6 +705,11 @@ namespace Structura.Assembler
 					case "DIV":
 						{
 							ret.AddRange(GetDivision(token[1], token[2]));
+							break;
+						}
+					case "MOD":
+						{
+							ret.AddRange(GetModulo(token[1], token[2]));
 							break;
 						}
                     case "SHIFTL":
