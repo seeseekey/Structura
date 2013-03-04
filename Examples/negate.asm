@@ -1,3 +1,10 @@
+ADD A 7;
+ADD B -8;
+NEG A;
+NEG B;
+NOOP;
+NOOP;
+NOOP;
 NOOP;
 NOOP;
 NOOP;

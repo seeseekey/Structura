@@ -1,3 +1,10 @@
+ADD A 5;
+ADD B -7;
+DEC A;
+DEC B;
+NOOP;
+NOOP;
+NOOP;
 NOOP;
 NOOP;
 NOOP;
