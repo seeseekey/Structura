@@ -41,11 +41,11 @@ Assembler description
 =====================
 
 ABS [Register]
-  > Type: complex command
-  > Effect: set the value in register to his absolute
-  > Flags: none
-  > Register used: Z
-  > Example: ABS A;
+  * Type: complex command
+  * Effect: set the value in register to his absolute
+  * Flags: none
+  * Register used: Z
+  * Example: ABS A;
   
 ADD [Register] [Register or value]
   > Type: basic command
