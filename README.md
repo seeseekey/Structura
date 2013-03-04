@@ -75,7 +75,7 @@ DIV [Register] [Register or value]
   > Register used: W, X, Y, Z
   > Example: DIV A 3;
 
-LOAD [Speicheradresse] [Register]
+LOAD [Register] [Memory adress] 
   > Type: basic command
   > Effect: Load 8 bytes from a memory adress to the specified register
   > Flags: none
@@ -145,7 +145,7 @@ SHIFTR [Register] [Register or value]
   > Register used: U, V, W, X, Y, Z
   > Example: SHIFTR A 3;
 
-WRITE [Register] [Memory address]
+WRITE [Memory address] [Register]
   > Type: basic command
   > Effect: Write 8 bytes from a register to the specified memory adress
   > Flags: none
