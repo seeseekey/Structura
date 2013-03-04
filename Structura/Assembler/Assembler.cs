@@ -215,14 +215,14 @@ namespace Structura.Assembler
         #endregion
 
         #region COPY
-        static Int64[] GetCopyInstruction(CopyMode copyMode, Int64 count, Int64 source, Int64 target)
+        static Int64[] GetCopyInstruction(CopyMode copyMode, Int64 count, Int64 target, Int64 source)
         {
             Int64[] instruction=new Int64[5];
             instruction[0]=2;
             instruction[1]=(Int64)copyMode;
             instruction[2]=count;
-            instruction[3]=source;
-            instruction[4]=target;
+			instruction[3]=target;
+			instruction[4]=source;
 
             return instruction;
         }
@@ -241,48 +241,48 @@ namespace Structura.Assembler
             val1=val1.TrimStart('*');
             val2=val2.TrimStart('*');
 
-            Int64 source;
             Int64 target;
+            Int64 source;
 
             if(IsRegister(val1))
-                source=GetRegisterNumber(val1);
+                target=GetRegisterNumber(val1);
             else
-                source=Convert.ToInt64(val1);
+                target=Convert.ToInt64(val1);
 
             if(IsRegister(val2))
-                target=GetRegisterNumber(val2);
+                source=GetRegisterNumber(val2);
             else
-                target=Convert.ToInt64(val2);
+                source=Convert.ToInt64(val2);
 
             if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==false)
             {
-                ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, count, source, target)); //none
+                ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, count, target, source)); //none
             }
             else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==false)
             {
-                ret.AddRange(GetCopyInstruction(CopyMode.FirstAdressContainsTargetAdressAsValue, count, source, target)); //first adress contains adress
+                ret.AddRange(GetCopyInstruction(CopyMode.FirstAdressContainsTargetAdressAsValue, count, target, source)); //first adress contains adress
             }
             else if(firstAdressContainsTargetAdressAsValue==false&&secondAdressContainsTargetAdressAsValue==true)
             {
-                ret.AddRange(GetCopyInstruction(CopyMode.SecondAdressContainsTargetAdressAsValue, count, source, target));
+                ret.AddRange(GetCopyInstruction(CopyMode.SecondAdressContainsTargetAdressAsValue, count, target, source));
             }
             else if(firstAdressContainsTargetAdressAsValue==true&&secondAdressContainsTargetAdressAsValue==true)
             {
-                ret.AddRange(GetCopyInstruction(CopyMode.BothAdressContainsTargetAdressAsValue, count, source, target));
+                ret.AddRange(GetCopyInstruction(CopyMode.BothAdressContainsTargetAdressAsValue, count, target, source));
             }
 
             return ret;
         }
 
-        static List<Int64> GetNeg(string val1, string workRegister)
-        {
-            List<Int64> ret=new List<Int64>();
-            ret.AddRange(GetCopy("8", val1, workRegister)); //Kopiere Register auf Z
-            ret.AddRange(GetAdd(val1, "-"+workRegister));
-            ret.AddRange(GetAdd(val1, "-"+workRegister));
-            ret.AddRange(GetCopy("8", "ZERO", workRegister)); //setze z auf 0
-            return ret;
-        }
+		static List<Int64> GetNeg(string val1, string workRegister)
+		{
+			List<Int64> ret=new List<Int64>();
+			ret.AddRange(GetCopy("8", workRegister, val1)); //Kopiere Register auf Z
+			ret.AddRange(GetAdd(val1, "-"+workRegister));
+			ret.AddRange(GetAdd(val1, "-"+workRegister));
+			ret.AddRange(GetCopy("8", workRegister, "ZERO")); //setze z auf 0
+			return ret;
+		}
 
         static List<Int64> GetMultiplication(string val1, string val2)
         {
@@ -302,21 +302,21 @@ namespace Structura.Assembler
                 addMode=AddMode.RegisterAndValue;
             }
 
-            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("Y"))); //kopiere Register auf Y
+            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Y"), GetRegisterNumber(val1))); //kopiere Register auf Y
 
             //AddMode auswerten
             if(addMode==AddMode.RegisterAndValue)
             {
-                ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+                ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Z"), GetRegisterNumber("ZERO")));
                 ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), target));
             }
             else //Register and Register
             {
-                ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
+                ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Z"), target)); //Kopiere nach Z
             }
 
             //Vorzeichen zählen
-            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("X")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("ZERO")));
 
             //Y
             ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Y"), 0));
@@ -331,7 +331,7 @@ namespace Structura.Assembler
             ret.AddRange(GetAdd("X", "1"));
 
             //Zähler absolut machen
-            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber(val1)));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("ZERO")));
             ret.AddRange(GetAbs("Y", "W")); 
             ret.AddRange(GetAbs("Z", "W")); 
 
@@ -343,17 +343,17 @@ namespace Structura.Assembler
             //Vorzeichen wieder antragen
 
             //Ist X==2?
-            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("W"), GetRegisterNumber("X")));
             ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -2));
             ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 368)); //springe zum register leeren
 
             //Ist X==1?
-            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("W"), GetRegisterNumber("X")));
             ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -1));
             ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 112)); //springe zum vorzeichen umdrehen
 
             //Ist X==0?
-            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("W"), GetRegisterNumber("X")));
             ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), 0));
             ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 144)); //springe zum register leeren
 
@@ -361,9 +361,9 @@ namespace Structura.Assembler
             ret.AddRange(GetNeg(val1, "W"));
 
             //Bereinige Register X, Y und Z
-            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("X")));
-            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Y")));
-            ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("ZERO")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Y"), GetRegisterNumber("ZERO")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Z"), GetRegisterNumber("ZERO")));
 
             return ret;
         }
@@ -386,17 +386,17 @@ namespace Structura.Assembler
 				addMode=AddMode.RegisterAndValue;
 			}
 
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("Y"))); //kopiere Register auf Y
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Y"), GetRegisterNumber(val1))); //kopiere Register auf Y
 
 			//AddMode auswerten
 			if(addMode==AddMode.RegisterAndValue)
 			{
-				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Z"), GetRegisterNumber("ZERO")));
 				ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), target));
 			}
 			else //Register and Register
 			{
-				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
+				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Z"), target)); //Kopiere nach Z
 			}
 
 			//Feststellen ob Division durch 0 vorliegt
@@ -404,7 +404,7 @@ namespace Structura.Assembler
 			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 1624)); //Überspringe restlichen DIV Block
 
 			//Vorzeichen zählen
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("X")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("ZERO")));
 
 			//Y
 			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Y"), 0));
@@ -419,12 +419,12 @@ namespace Structura.Assembler
 			ret.AddRange(GetAdd("X", "1"));
 
 			//Zähler absolut machen
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber(val1)));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("ZERO")));
 			ret.AddRange(GetAbs("Y", "W"));
 			ret.AddRange(GetAbs("Z", "W"));
 
 			//Zielregister leeren um Ergebnis zu speichern
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber(val1)));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("ZERO")));
 
 			//Divisionsschleife
 			ret.AddRange(GetAddInstruction(AddMode.RegisterAndNegativeRegister, GetRegisterNumber("Y"), GetRegisterNumber("Z"))); //Source + Source
@@ -436,17 +436,17 @@ namespace Structura.Assembler
 			//Vorzeichen wieder antragen
 
 			//Ist X==2?
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("W"), GetRegisterNumber("X")));
 			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -2));
 			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 368)); //springe zum register leeren
 
 			//Ist X==1?
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("W"), GetRegisterNumber("X")));
 			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -1));
 			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 112)); //springe zum vorzeichen umdrehen
 
 			//Ist X==0?
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("W"), GetRegisterNumber("X")));
 			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), 0));
 			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 144)); //springe zum register leeren
 
@@ -454,9 +454,9 @@ namespace Structura.Assembler
 			ret.AddRange(GetNeg(val1, "W"));
 
 			//Bereinige Register X, Y und Z
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("X")));
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Y")));
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("ZERO")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Y"), GetRegisterNumber("ZERO")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Z"), GetRegisterNumber("ZERO")));
 
 			return ret;
 		}
@@ -479,17 +479,17 @@ namespace Structura.Assembler
 				addMode=AddMode.RegisterAndValue;
 			}
 
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("Y"))); //kopiere Register auf Y
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Y"), GetRegisterNumber(val1))); //kopiere Register auf Y
 
 			//AddMode auswerten
 			if(addMode==AddMode.RegisterAndValue)
 			{
-				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Z"), GetRegisterNumber("ZERO")));
 				ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), target));
 			}
 			else //Register and Register
 			{
-				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, target, GetRegisterNumber("Z"))); //Kopiere nach Z
+				ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Z"), target)); //Kopiere nach Z
 			}
 
 			//Feststellen ob Division durch 0 vorliegt
@@ -497,7 +497,7 @@ namespace Structura.Assembler
 			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 1624)); //Überspringe restlichen DIV Block
 
 			//Vorzeichen zählen
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("X")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("ZERO")));
 
 			//Y
 			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Y"), 0));
@@ -512,35 +512,35 @@ namespace Structura.Assembler
 			ret.AddRange(GetAdd("X", "1"));
 
 			//Zähler absolut machen
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber(val1)));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("ZERO")));
 			ret.AddRange(GetAbs("Y", "W"));
 			ret.AddRange(GetAbs("Z", "W"));
 
 			//Zielregister leeren um Ergebnis zu speichern
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber(val1)));
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Y"), GetRegisterNumber(val1))); //ersten Rest zuweisen
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("ZERO")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("Y"))); //ersten Rest zuweisen
 
 			//Divisionsschleife
 			ret.AddRange(GetAddInstruction(AddMode.RegisterAndNegativeRegister, GetRegisterNumber("Y"), GetRegisterNumber("Z"))); //Source + Source
 			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 120)); //Bedingter Sprung wenn Z>0;
 			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Negative, JumpMode.Relative, 80)); //Bedingter Sprung wenn Z>0;
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Y"), GetRegisterNumber(val1))); //Rest zuweisen
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber(val1), GetRegisterNumber("Y"))); //Rest zuweisen
 			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, -192)); //Sprung zurück
 
 			//Vorzeichen wieder antragen
 
 			//Ist X==2?
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("W"), GetRegisterNumber("X")));
 			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -2));
 			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 368)); //springe zum register leeren
 
 			//Ist X==1?
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("W"), GetRegisterNumber("X")));
 			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), -1));
 			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 112)); //springe zum vorzeichen umdrehen
 
 			//Ist X==0?
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("W")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("W"), GetRegisterNumber("X")));
 			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("W"), 0));
 			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 144)); //springe zum register leeren
 
@@ -548,29 +548,29 @@ namespace Structura.Assembler
 			ret.AddRange(GetNeg(val1, "W"));
 
 			//Bereinige Register X, Y und Z
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("X")));
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Y")));
-			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("Z")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("X"), GetRegisterNumber("ZERO")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Y"), GetRegisterNumber("ZERO")));
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("Z"), GetRegisterNumber("ZERO")));
 
 			return ret;
 		}
 
-        static List<Int64> GetAbs(string val1, string workRegister)
-        {
-            List<Int64> ret=new List<Int64>();
+		static List<Int64> GetAbs(string val1, string workRegister)
+		{
+			List<Int64> ret=new List<Int64>();
 
-            ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(val1), 0));
-            ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, 184)); //Überspringe Abs Block
-            ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 144)); //Überspringe Abs Block
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(val1), 0));
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, 184)); //Überspringe Abs Block
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 144)); //Überspringe Abs Block
 
-            //Abs Block
-            ret.AddRange(GetCopy("8", val1, workRegister)); //Kopiere Register auf Z
-            ret.AddRange(GetAdd(val1, "-"+workRegister));
-            ret.AddRange(GetAdd(val1, "-"+workRegister));
-            ret.AddRange(GetCopy("8", "ZERO", workRegister)); //setze zw auf 0
+			//Abs Block
+			ret.AddRange(GetCopy("8", workRegister, val1)); //Kopiere Register auf Z
+			ret.AddRange(GetAdd(val1, "-"+workRegister));
+			ret.AddRange(GetAdd(val1, "-"+workRegister));
+			ret.AddRange(GetCopy("8", workRegister, "ZERO")); //setze zw auf 0
 
-            return ret;
-        }
+			return ret;
+		}
 
         static List<Int64> GetAdd(string val1, string val2)
         {
@@ -685,14 +685,14 @@ namespace Structura.Assembler
                             ret.AddRange(GetAbs(token[1], "Z"));
                             break;
                         }
-                    case "NEG":
-                        {
-                            ret.AddRange(GetCopy("8", token[1], "Z")); //Kopiere Register auf Z
-                            ret.AddRange(GetAdd(token[1], "-Z"));
-                            ret.AddRange(GetAdd(token[1], "-Z"));
-                            ret.AddRange(GetCopy("8", "ZERO", "Z")); //setze z auf 0
-                            break;
-                        }
+					case "NEG":
+						{
+							ret.AddRange(GetCopy("8", "Z", token[1])); //Kopiere Register auf Z
+							ret.AddRange(GetAdd(token[1], "-Z"));
+							ret.AddRange(GetAdd(token[1], "-Z"));
+							ret.AddRange(GetCopy("8", "Z", "ZERO")); //setze z auf 0
+							break;
+						}
                     case "ADD":
                         {
                             ret.AddRange(GetAdd(token[1], token[2]));
@@ -731,15 +731,15 @@ namespace Structura.Assembler
 							}
 
 							//Register W X Y Z vorbereiten
-							ret.AddRange(GetCopy("8", "ZERO", "U")); //setze w auf 0
+							ret.AddRange(GetCopy("8", "U", "ZERO")); //setze w auf 0
 							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("U"), 2)); //setze w auf 2
 
 							if(addMode==AddMode.RegisterAndRegister)
-								ret.AddRange(GetCopy("8", token[2], "V"));
+								ret.AddRange(GetCopy("8", "V", token[2]));
 							else
 							{
 								//RegisterAndValue
-								ret.AddRange(GetCopy("8", "ZERO", "V")); //setze w auf 0
+								ret.AddRange(GetCopy("8", "V", "ZERO")); //setze w auf 0
 								ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("V"), Convert.ToInt64(token[2]))); //Wert setzen
 							}
 
@@ -755,7 +755,7 @@ namespace Structura.Assembler
 							ret.AddRange(GetMultiplication(token[1], "U"));
 
 							//W bereinigen
-							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("U")));
+							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("U"), GetRegisterNumber("ZERO")));
 
 							break;
 						}
@@ -777,15 +777,15 @@ namespace Structura.Assembler
 							}
 
 							//Register W X Y Z vorbereiten
-							ret.AddRange(GetCopy("8", "ZERO", "U")); //setze w auf 0
+							ret.AddRange(GetCopy("8", "U", "ZERO")); //setze w auf 0
 							ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("U"), 2)); //setze w auf 2
 
 							if(addMode==AddMode.RegisterAndRegister)
-								ret.AddRange(GetCopy("8", token[2], "V"));
+								ret.AddRange(GetCopy("8", "V", token[2]));
 							else
 							{
 								//RegisterAndValue
-								ret.AddRange(GetCopy("8", "ZERO", "V")); //setze w auf 0
+								ret.AddRange(GetCopy("8", "V", "ZERO")); //setze w auf 0
 								ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("V"), Convert.ToInt64(token[2]))); //Wert setzen
 							}
 
@@ -801,7 +801,7 @@ namespace Structura.Assembler
 							ret.AddRange(GetDivision(token[1], "U"));
 
 							//W bereinigen
-							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber("U")));
+							ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("U"), GetRegisterNumber("ZERO")));
 
 							break;
 						}
@@ -814,36 +814,36 @@ namespace Structura.Assembler
                         {
                             if(token[1]=="ALL")
                             {
-                                ret.AddRange(GetCopy("8", "ZERO", "A"));
-                                ret.AddRange(GetCopy("8", "ZERO", "B"));
-                                ret.AddRange(GetCopy("8", "ZERO", "C"));
-                                ret.AddRange(GetCopy("8", "ZERO", "D"));
-                                ret.AddRange(GetCopy("8", "ZERO", "E"));
-                                ret.AddRange(GetCopy("8", "ZERO", "F"));
-                                ret.AddRange(GetCopy("8", "ZERO", "G"));
-                                ret.AddRange(GetCopy("8", "ZERO", "H"));
-                                ret.AddRange(GetCopy("8", "ZERO", "I"));
-                                ret.AddRange(GetCopy("8", "ZERO", "J"));
-                                ret.AddRange(GetCopy("8", "ZERO", "K"));
-                                ret.AddRange(GetCopy("8", "ZERO", "L"));
-                                ret.AddRange(GetCopy("8", "ZERO", "M"));
-                                ret.AddRange(GetCopy("8", "ZERO", "N"));
-                                ret.AddRange(GetCopy("8", "ZERO", "O"));
-                                ret.AddRange(GetCopy("8", "ZERO", "P"));
-                                ret.AddRange(GetCopy("8", "ZERO", "Q"));
-                                ret.AddRange(GetCopy("8", "ZERO", "R"));
-                                ret.AddRange(GetCopy("8", "ZERO", "S"));
-                                ret.AddRange(GetCopy("8", "ZERO", "T"));
-                                ret.AddRange(GetCopy("8", "ZERO", "U"));
-                                ret.AddRange(GetCopy("8", "ZERO", "V"));
-                                ret.AddRange(GetCopy("8", "ZERO", "W"));
-                                ret.AddRange(GetCopy("8", "ZERO", "X"));
-                                ret.AddRange(GetCopy("8", "ZERO", "Y"));
-                                ret.AddRange(GetCopy("8", "ZERO", "Z"));
+								ret.AddRange(GetCopy("8", "A", "ZERO"));
+								ret.AddRange(GetCopy("8", "B", "ZERO"));
+								ret.AddRange(GetCopy("8", "C", "ZERO"));
+								ret.AddRange(GetCopy("8", "D", "ZERO"));
+								ret.AddRange(GetCopy("8", "E", "ZERO"));
+								ret.AddRange(GetCopy("8", "F", "ZERO"));
+								ret.AddRange(GetCopy("8", "G", "ZERO"));
+								ret.AddRange(GetCopy("8", "H", "ZERO"));
+								ret.AddRange(GetCopy("8", "I", "ZERO"));
+								ret.AddRange(GetCopy("8", "J", "ZERO"));
+								ret.AddRange(GetCopy("8", "K", "ZERO"));
+								ret.AddRange(GetCopy("8", "L", "ZERO"));
+								ret.AddRange(GetCopy("8", "M", "ZERO"));
+								ret.AddRange(GetCopy("8", "N", "ZERO"));
+								ret.AddRange(GetCopy("8", "O", "ZERO"));
+								ret.AddRange(GetCopy("8", "P", "ZERO"));
+								ret.AddRange(GetCopy("8", "Q", "ZERO"));
+								ret.AddRange(GetCopy("8", "R", "ZERO"));
+								ret.AddRange(GetCopy("8", "S", "ZERO"));
+								ret.AddRange(GetCopy("8", "T", "ZERO"));
+								ret.AddRange(GetCopy("8", "U", "ZERO"));
+								ret.AddRange(GetCopy("8", "V", "ZERO"));
+								ret.AddRange(GetCopy("8", "W", "ZERO"));
+								ret.AddRange(GetCopy("8", "X", "ZERO"));
+								ret.AddRange(GetCopy("8", "Y", "ZERO"));
+								ret.AddRange(GetCopy("8", "Z", "ZERO"));
                             }
                             else
                             {
-                                ret.AddRange(GetCopy("8", "ZERO", token[1]));
+                                ret.AddRange(GetCopy("8", token[1], "ZERO"));
                             }
                             break;
                         }

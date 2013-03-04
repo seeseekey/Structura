@@ -469,40 +469,40 @@ namespace Structura.Hardware
                     {
                         Int64 copyMode=GetNextInstructionWord(instructionLog);
                         Int64 count=GetNextInstructionWord(instructionLog);
-                        Int64 sourceAdress=GetNextInstructionWord(instructionLog);
                         Int64 targetAdress=GetNextInstructionWord(instructionLog);
+                        Int64 sourceAdress=GetNextInstructionWord(instructionLog);
 
                         byte[] sourceValue;//=new byte[count];
 
-                        if(sourceAdress<0) //First value is register
+						if(sourceAdress<0) //First value is register
                         {
                             if(copyMode==1||copyMode==3)
                             {
-                                Int64 registerValue=GetRegisterValue(sourceAdress);
+								Int64 registerValue=GetRegisterValue(sourceAdress);
                                 sourceValue=Memory.GetData(registerValue, count);
                             }
                             else
                             {
-                                sourceValue=BitConverter.GetBytes(GetRegisterValue(sourceAdress));
+								sourceValue=BitConverter.GetBytes(GetRegisterValue(sourceAdress));
                             }
                         }
                         else
                         {
-                            sourceValue=Memory.GetData(sourceAdress, count);
+							sourceValue=Memory.GetData(sourceAdress, count);
                         }
 
-                        if(targetAdress<0) //Second value is register
+						if(targetAdress<0) //Second value is register
                         {
                             Int64 targetRegister;
 
                             if(copyMode==2||copyMode==3)
                             {
-                                targetRegister=GetRegisterValue(targetAdress);
+								targetRegister=GetRegisterValue(targetAdress);
                                 Memory.WriteData(targetRegister, sourceValue);
                             }
                             else
                             {
-                                targetRegister=targetAdress;
+								targetRegister=targetAdress;
                                 SetRegisterValue(targetRegister, BitConverter.ToInt64(sourceValue, 0));
                             }
                         }
