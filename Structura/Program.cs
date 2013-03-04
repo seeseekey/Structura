@@ -19,7 +19,7 @@ namespace Structura
         static int cycleInterval=1000;
         static bool running=true;
         static bool traceExecution=false;
-		static string traceExecutionFilename="trace.txt";
+        static string traceExecutionFilename="";
 
         static void PrintInternalStates(Hardware.Structura cpu)
         {
@@ -30,9 +30,9 @@ namespace Structura
             Console.WriteLine("Cycles: {0}", cycles);
             Console.WriteLine("");
             Console.WriteLine("Register:");
-			Console.WriteLine("A: {0}, B: {1}, C: {2}, D: {3}, E: {4}, F: {5}, G: {6}, H: {7}, I: {8}, J: {9},", cpu.A, cpu.B, cpu.C, cpu.D, cpu.E, cpu.F, cpu.G, cpu.H, cpu.I, cpu.J);
-			Console.WriteLine("K: {0}, L: {1}, M: {2}, N: {3}, O: {4}, P: {5}, Q: {6}, R: {7}, S: {8}, T: {9},", cpu.K, cpu.L, cpu.M, cpu.N, cpu.O, cpu.P, cpu.Q, cpu.R, cpu.S, cpu.T);
-			Console.WriteLine("U: {0}, V: {1}, W: {2}, X: {3}, Y: {4}, Z: {5}", cpu.U, cpu.V, cpu.W, cpu.X, cpu.Y, cpu.Z);
+            Console.WriteLine("A: {0}, B: {1}, C: {2}, D: {3}, E: {4}, F: {5}, G: {6}, H: {7}, I: {8}, J: {9},", cpu.A, cpu.B, cpu.C, cpu.D, cpu.E, cpu.F, cpu.G, cpu.H, cpu.I, cpu.J);
+            Console.WriteLine("K: {0}, L: {1}, M: {2}, N: {3}, O: {4}, P: {5}, Q: {6}, R: {7}, S: {8}, T: {9},", cpu.K, cpu.L, cpu.M, cpu.N, cpu.O, cpu.P, cpu.Q, cpu.R, cpu.S, cpu.T);
+            Console.WriteLine("U: {0}, V: {1}, W: {2}, X: {3}, Y: {4}, Z: {5}", cpu.U, cpu.V, cpu.W, cpu.X, cpu.Y, cpu.Z);
             Console.WriteLine("");
             Console.WriteLine("Special registers:");
             Console.WriteLine("IC: {0}", cpu.IC);
@@ -121,10 +121,10 @@ namespace Structura
 
             //Trace execution
             traceExecution=arguments.Contains("traceExecution");
-			if(traceExecution)
-			{
-				traceExecutionFilename=arguments.GetString("traceExecution");
-			}
+            if(traceExecution)
+            {
+                traceExecutionFilename=arguments.GetString("traceExecution", "trace.txt");
+            }
 
             //execute system
             Thread thread=new Thread(new ThreadStart(ExecuteSystem));
@@ -150,12 +150,12 @@ namespace Structura
 
         static void ExecuteSystem()
         {
-			StreamWriter writer=null;
+            StreamWriter writer=null;
             List<Int64> processedInstructions=new List<Int64>();
 
             if(traceExecution)
             {
-				writer=new StreamWriter(traceExecutionFilename);
+                writer=new StreamWriter(traceExecutionFilename);
             }
 
             while(running)
@@ -188,17 +188,17 @@ namespace Structura
 
             if(traceExecution)
             {
-				if(writer!=null)
-				{
-					List<string> lines=Disassembler.Disassemble(processedInstructions.ToArray(), false); //IC Nummern stimmen beim trace nicht (kein reiner Disassemble)
+                if(writer!=null)
+                {
+                    List<string> lines=Disassembler.Disassemble(processedInstructions.ToArray(), false); //IC Nummern stimmen beim trace nicht (kein reiner Disassemble)
 
-					foreach(string line in lines)
-					{
-						writer.WriteLine(line);
-					}
+                    foreach(string line in lines)
+                    {
+                        writer.WriteLine(line);
+                    }
 
-					writer.Close();
-				}
+                    writer.Close();
+                }
             }
         }
     }
