@@ -24,15 +24,14 @@ namespace Structura
         {
             Console.Clear();
 
-            Console.WriteLine("Structura System v13.02");
+            Console.WriteLine("Structura System v13.03");
             Console.WriteLine("");
             Console.WriteLine("Cycles: {0}", cycles);
             Console.WriteLine("");
             Console.WriteLine("Register:");
-            Console.WriteLine("A: {0}, B: {1}, C: {2}, D: {3}, E: {4}, F: {5}, G: {6}, H: {7}", cpu.A, cpu.B, cpu.C, cpu.D, cpu.E, cpu.F, cpu.G, cpu.H);
-            Console.WriteLine("I: {0}, J: {1}, K: {2}, L: {3}, M: {4}, N: {5}, O: {6}, P: {7}", cpu.I, cpu.J, cpu.K, cpu.L, cpu.M, cpu.N, cpu.O, cpu.P);
-            Console.WriteLine("Q: {0}, R: {1}, S: {2}, T: {3}, U: {4}, V: {5}, W: {6}, X: {7}", cpu.Q, cpu.R, cpu.S, cpu.T, cpu.U, cpu.V, cpu.W, cpu.X);
-            Console.WriteLine("Y: {0}, Z: {1}", cpu.Y, cpu.Z);
+			Console.WriteLine("A: {0}, B: {1}, C: {2}, D: {3}, E: {4}, F: {5}, G: {6}, H: {7}, I: {8}, J: {9},", cpu.A, cpu.B, cpu.C, cpu.D, cpu.E, cpu.F, cpu.G, cpu.H, cpu.I, cpu.J);
+			Console.WriteLine("K: {0}, L: {1}, M: {2}, N: {3}, O: {4}, P: {5}, Q: {6}, R: {7}, S: {8}, T: {9},", cpu.K, cpu.L, cpu.M, cpu.N, cpu.O, cpu.P, cpu.Q, cpu.R, cpu.S, cpu.T);
+			Console.WriteLine("U: {0}, V: {1}, W: {2}, X: {3}, Y: {4}, Z: {5}", cpu.U, cpu.V, cpu.W, cpu.X, cpu.Y, cpu.Z);
             Console.WriteLine("");
             Console.WriteLine("Special registers:");
             Console.WriteLine("IC: {0}", cpu.IC);
