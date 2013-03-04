@@ -6,6 +6,7 @@ Structura is a 64 bit cpu architecture.
 Machine code
 ============
 
+```
 JUMP (Width: 40 Byte)
   [Int64|Instruction word - 0]
   [Int64|Adress interpretation - 0/ANCTAAV 1/ACTAAV 2/RNCTAAV 3/RCTAAV]
@@ -36,6 +37,7 @@ COPY (Width: 40 Byte)
   [Int64|Amount of copied data in bytes]
   [Int64|Register or memory adress] 
   [Int64|Register, memory adress or ZERO]
+```
 
 Assembler description
 =====================
