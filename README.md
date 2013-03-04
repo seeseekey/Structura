@@ -34,8 +34,8 @@ COPY (Width: 40 Byte)
     SACTAAV - Second adress contains target adress as value
     BACTAAV - Both adress contains target adress as value
   [Int64|Amount of copied data in bytes]
-  [Int64|Register, memory adress or ZERO] 
-  [Int64|Register or memory adress]
+  [Int64|Register or memory adress] 
+  [Int64|Register, memory adress or ZERO]
 
 Assembler description
 =====================
@@ -47,28 +47,28 @@ ABS [Register]
   > Register used: Z
   > Example: ABS A;
   
-ADD [Register] [Register oder Wert]
+ADD [Register] [Register or value]
   > Type: basic command
   > Effect: Adds a value to the register on the left
   > Flags: none
   > Register used: Z
   > Example: ABS A;
 
-CLR [Register oder ALL]
+CLR [Register or ALL]
   > Type: complex command
   > Effect: Set specified register to zero
   > Flags: none
   > Register used: none
   > Example: CLR A;
 
-COPY [Int64|Menge an kopierenden Daten in Byte] [Register oder Speicheradresse] [Register oder Speicheradresse]
+COPY [Int64|Menge an kopierenden Daten in Byte] [Register or memory adress] [Register, memory adress or ZERO]
   > Type: basic command
   > Effect: Copy data from register to memory, and reverse, in any combination
   > Flags: none
   > Register used: none
   > Example: COPY 8 A 2100;
 
-DIV [Register] [Register oder Wert]
+DIV [Register] [Register or value]
   > Type: complex command
   > Effect: Divide the first value through the second value
   > Flags: Zero (if division by 0)
@@ -103,7 +103,7 @@ JUMP [Jump condition|NONE|ZERO|POS|NEG|OVL] [Jump adressing|ABS|REL] [Adress or 
   > Register used: none
   > Example: JUMP POS REL -100;
   
-MOD [Register] [Register oder Wert]
+MOD [Register] [Register or value]
   > Type: complex command
   > Effect: Write the remainder the of the division in the first value
   > Flags: Zero (if division by 0)
@@ -131,14 +131,14 @@ NOOP
   > Register used: none
   > Example: NOOP;
 
-SHIFTL [Register] [Register oder Wert]
+SHIFTL [Register] [Register or value]
   > Type: complex command
   > Effect: Left shift the value in the specified register by the second value
   > Flags: none
   > Register used: U, V, W, X, Y, Z
   > Example: SHIFTL A 3;
 
-SHIFTR [Register] [Register oder Wert]
+SHIFTR [Register] [Register or value]
   > Type: complex command
   > Effect: Right shift the value in the specified register by the second value
   > Flags: none
