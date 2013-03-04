@@ -52,7 +52,7 @@ namespace Structura
             Console.WriteLine("Structura.exe program.asm -disassemble");
             Console.WriteLine("");
             Console.WriteLine("Parameter:");
-            Console.WriteLine("  -file:<filename>");
+            Console.WriteLine("  <filename>");
             Console.WriteLine("  -cycleInterval:<timeInMilliSeconds>");
             Console.WriteLine("  -disassemble <-withIC>");
             Console.WriteLine("  -traceExecution:<filename>");
