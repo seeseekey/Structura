@@ -19,6 +19,7 @@ namespace Structura
         static int cycleInterval=1000;
         static bool running=true;
         static bool traceExecution=false;
+		static string traceExecutionFilename="trace.txt";
 
         static void PrintInternalStates(Hardware.Structura cpu)
         {
@@ -54,7 +55,7 @@ namespace Structura
             Console.WriteLine("  -file:<filename>");
             Console.WriteLine("  -cycleInterval:<timeInMilliSeconds>");
             Console.WriteLine("  -disassemble <-withIC>");
-            Console.WriteLine("  -traceExecution");
+            Console.WriteLine("  -traceExecution:<filename>");
         }
 
         static void Main(string[] args)
@@ -120,6 +121,10 @@ namespace Structura
 
             //Trace execution
             traceExecution=arguments.Contains("traceExecution");
+			if(traceExecution)
+			{
+				traceExecutionFilename=arguments.GetString("traceExecution");
+			}
 
             //execute system
             Thread thread=new Thread(new ThreadStart(ExecuteSystem));
@@ -150,7 +155,7 @@ namespace Structura
 
             if(traceExecution)
             {
-                writer=new StreamWriter("trace.txt");
+				writer=new StreamWriter(traceExecutionFilename);
             }
 
             while(running)
