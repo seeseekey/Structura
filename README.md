@@ -48,18 +48,18 @@ ABS [Register]
   * Example: ABS A;
   
 ADD [Register] [Register or value]
-  > Type: basic command
-  > Effect: Adds a value to the register on the left
-  > Flags: none
-  > Register used: Z
-  > Example: ABS A;
+  - Type: basic command
+  - Effect: Adds a value to the register on the left
+  - Flags: none
+  - Register used: Z
+  - Example: ABS A;
 
 CLR [Register or ALL]
-  > Type: complex command
-  > Effect: Set specified register to zero
-  > Flags: none
-  > Register used: none
-  > Example: CLR A;
+  # Type: complex command
+  # Effect: Set specified register to zero
+  # Flags: none
+  # Register used: none
+  # Example: CLR A;
 
 COPY [Int64|Menge an kopierenden Daten in Byte] [Register or memory adress] [Register, memory adress or ZERO]
   > Type: basic command
