@@ -419,10 +419,15 @@ namespace Structura.Assembler
 			ret.AddRange(GetAbs("Y", "W"));
 			ret.AddRange(GetAbs("Z", "W"));
 
-			//Multiplikationsschleife
-			ret.AddRange(GetAddInstruction(AddMode.RegisterAndRegister, GetRegisterNumber(val1), GetRegisterNumber("Y"))); //Source + Source
-			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber("Z"), -1)); //DEC Z 1 //Breite bis hier -80
-			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Positive, JumpMode.Relative, -104)); //Bedingter Sprung wenn Z>0;
+			//Zielregister leeren um Ergebnis zu speichern
+			ret.AddRange(GetCopyInstruction(CopyMode.NoAdressContainsTargetAdressAsValue, 8, GetRegisterNumber("ZERO"), GetRegisterNumber(val1)));
+
+			//Divisionsschleife
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndNegativeRegister, GetRegisterNumber("Y"), GetRegisterNumber("Z"))); //Source + Source
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Zero, JumpMode.Relative, 152)); //Bedingter Sprung wenn Z>0;
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.Negative, JumpMode.Relative, 112)); //Bedingter Sprung wenn Z>0;
+			ret.AddRange(GetAddInstruction(AddMode.RegisterAndValue, GetRegisterNumber(val1), 1)); //wenn wert nicht negativ oder null, zähle hoch
+			ret.AddRange(GetJumpInstruction(AdressInterpretation.AdressNotContainsTargetAdressAsValue, JumpCondition.None, JumpMode.Relative, -184)); //Sprung zurück
 
 			//Vorzeichen wieder antragen
 
