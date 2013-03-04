@@ -19,7 +19,7 @@ JUMP (Width: 40 Byte)
 
 ADD (Width: 32 Byte)
   [Int64|Instruction word - 1]
-  [Int64|Mode - 0/RAR 1/RAV] 
+  [Int64|Mode - 0/RAR 1/RANR 2/RAV] 
       RAR - Register and register
       RANR - Register and negative register
       RAV - Register and value
