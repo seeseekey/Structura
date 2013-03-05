@@ -6,14 +6,13 @@
 
       function timedRefresh(timeoutPeriod)
       {
-        canvas = document.getElementById("x");
+        canvas = document.getElementById("paintSurface");
         context = canvas.getContext("2d");
         img = new Image();
 
         img.onload = function() {
 		  context.clearRect ( 0 , 0 , 500, 500 );
           context.drawImage(img, x, y);
-          //x+=20; y+=20;
           setTimeout("timedRefresh("+timeoutPeriod+")",timeoutPeriod);
 		  img.destroy();
         };
@@ -25,7 +24,7 @@
   <title>Structura Display Viewer</title>
   </head>
   <body onload="JavaScript:timedRefresh(1000);">
-    <canvas id="x" width="500" height="500" />
+    <canvas id="paintSurface" width="500" height="500" />
   </body>
 </html>
 
