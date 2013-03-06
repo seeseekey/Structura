@@ -3,6 +3,15 @@ Structura
 
 Structura is a 64 bit cpu architecture.
 
+Memory overlays
+===============
+
+```
+Main memory: 0 - 8999999999999999999
+Graphic card: 9000000000000000000 - 9099999999999999999
+Keyboard: 9100000000000000000 - 9100000000000008191
+```
+
 Machine code
 ============
 
@@ -155,3 +164,7 @@ WRITE [Memory address] [Register]
   > Register used: none
   > Example: WRITE A 1234;
 ```
+
+Websites
+========
+* http://seeseekey.net/blog/12566 (german article)
