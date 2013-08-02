@@ -7,6 +7,7 @@ using System.IO;
 using CSCL;
 using Structura.Hardware;
 using Structura.Assembler;
+using CSCL.Helpers;
 
 namespace Structura
 {
@@ -60,14 +61,14 @@ namespace Structura
 
         static void Main(string[] args)
         {
-            Parameters arguments=Parameters.InterpretCommandLine(args);
+            Dictionary<string, string> arguments=CommandLineHelpers.GetCommandLine(args);
 
-            if(!arguments.Contains("file000")||arguments.Contains("h")||arguments.Contains("help")||arguments.Contains("?"))
+			if(!arguments.ContainsKey("file0")||arguments.ContainsKey("h")||arguments.ContainsKey("help")||arguments.ContainsKey("?"))
             {
                 ShowHelp();
             }
 
-            string filename=arguments.GetString("file000");
+            string filename=arguments["file0"];
 
             if(!File.Exists(filename))
             {
@@ -75,9 +76,9 @@ namespace Structura
                 return;
             }
 
-            if(arguments.Contains("cycleInterval"))
+			if(arguments.ContainsKey("cycleInterval"))
             {
-                cycleInterval=Convert.ToInt32(arguments.GetString("cycleInterval"));
+                cycleInterval=Convert.ToInt32(arguments["cycleInterval"]);
             }
 
             Console.CancelKeyPress+=new ConsoleCancelEventHandler(Console_CancelKeyPress);
@@ -95,9 +96,9 @@ namespace Structura
             }
 
             //Prüfe auf Disassembler
-            if(arguments.Contains("disassemble"))
+            if(arguments.ContainsKey("disassemble"))
             {
-                bool withIC=arguments.GetBool("withIC", false);
+				bool withIC=arguments.ContainsKey("withIC");
                 List<string> disassembly=Disassembler.Disassemble(machineCodeAsByteArray, withIC);
 
                 foreach(string line in disassembly)
@@ -120,10 +121,11 @@ namespace Structura
             cpu=new Hardware.Structura(memory);
 
             //Trace execution
-            traceExecution=arguments.Contains("traceExecution");
+            traceExecution=arguments.ContainsKey("traceExecution");
             if(traceExecution)
             {
-                traceExecutionFilename=arguments.GetString("traceExecution", "trace.txt");
+                traceExecutionFilename=arguments["traceExecution"];
+				if(traceExecutionFilename=="") traceExecutionFilename="trace.txt";
             }
 
             //execute system
