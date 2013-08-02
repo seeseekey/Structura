@@ -78,7 +78,7 @@ namespace Structura.Hardware
                 image.SetPixel((int)x, (int)y, Color.FromArgb(a, r, g, b));
             }
 
-            image.SaveToPNGGDI("display.png");
+            image.SaveToPNG("display.png");
         }
     }
 }
