@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.IO;
-using CSCL;
 using Structura.Hardware;
 using Structura.Assembler;
-using CSCL.Helpers;
+using Xevle.Core.Helper;
 
 namespace Structura
 {
@@ -26,7 +25,7 @@ namespace Structura
         {
             Console.Clear();
 
-            Console.WriteLine("Structura System v13.03");
+            Console.WriteLine("Structura System v17.04");
             Console.WriteLine("");
             Console.WriteLine("Cycles: {0}", cycles);
             Console.WriteLine("");

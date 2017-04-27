@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 using System.Drawing;
-using CSCL.Imaging;
+using Xevle.Imaging.Image;
+using Xevle.Imaging.Image.Formats;
 
 namespace Structura.Hardware
 {
@@ -63,7 +61,7 @@ namespace Structura.Hardware
 
 		public void Display()
 		{
-			CSCL.Imaging.Graphic image=new CSCL.Imaging.Graphic((uint)width, (uint)height, Format.RGB);
+			Image8i image=new Image8i((uint)width, (uint)height, ChannelFormat.RGB);
 
 			for(Int64 i=Constants.GraphicMemoryDisplayAdressStart; i<width*height; i++)
 			{
@@ -75,10 +73,10 @@ namespace Structura.Hardware
 				byte b=data[i+2];
 				byte a=data[i+3];
 
-				image.SetPixel((int)x, (int)y, Color.FromArgb(a, r, g, b));
+				image.SetPixel((int)x, (int)y, new Color8i(r, g, b, a));
 			}
 
-			image.SaveToPNG("display.png");
+			FormatAdapter.SaveToPNG("display.png", image);
 		}
 	}
 }

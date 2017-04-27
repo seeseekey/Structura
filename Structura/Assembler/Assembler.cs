@@ -716,7 +716,7 @@ namespace Structura.Assembler
                     case "SHIFTL":
 						{
 							//Vorbereitung für SHIFTL
-							Int64 target=0;
+							Int64 target;
 							AddMode addMode;
 
 							if(IsRegister(token[2])) //Register and register
@@ -762,7 +762,7 @@ namespace Structura.Assembler
 					case "SHIFTR":
 						{
 							//Vorbereitung für SHIFTR
-							Int64 target=0;
+							Int64 target;
 							AddMode addMode;
 
 							if(IsRegister(token[2])) //Register and register
