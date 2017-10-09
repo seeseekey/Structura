@@ -167,4 +167,4 @@ WRITE [Memory address] [Register]
 
 Websites
 ========
-* http://seeseekey.net/blog/12566 (german article)
+* https://seeseekey.net/archive/12566 (german article)
